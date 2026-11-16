@@ -34,7 +34,3 @@ Each of `run-1/` and `run-2/` holds:
 ## Checking the numbers
 
 The raw totals in `evaluations.json` cover all 173 golden comments: 104 hits in run 1 and 109 in run 2. The board's default view is the Core set, which leaves out 15 of them and has 158. The table above is the Core set, computed with `_compute_profile_metrics` in Martian's `offline/analysis/benchmark_dashboard.py`, the same function the board uses.
-
-## One thing to know
-
-Both runs had a verification step switched on. It was switched off in production later the same day, so a run made after that may differ slightly.
