@@ -1,0 +1,2513 @@
+{
+  "https://github.com/keycloak/keycloak/pull/37429": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "The translation is in Italian instead of Lithuanian. This should be translated to Lithuanian to match the file's locale (messages_lt.properties).",
+          "severity": "Medium",
+          "category": "doc_defect",
+          "matched_candidate": "`loginTotpStep1` in `messages_lt.properties` contains Italian text instead of Lithuanian, causing Lithuanian users to see Italian instructions on the login page during TOTP setup",
+          "confidence": 1.0,
+          "reasoning": "The candidate issue identifies exactly the same problem as the golden comment: the loginTotpStep1 entry in messages_lt.properties contains Italian text instead of Lithuanian. Both comments point out that Italian text is incorrectly placed in the Lithuanian locale file."
+        },
+        {
+          "golden_comment": "The totpStep1 value uses Traditional Chinese terms in the Simplified Chinese file (zh_CN), which is likely incorrect for this locale. Please verify the locale\u2011appropriate translation.",
+          "severity": "Medium",
+          "category": "doc_defect",
+          "matched_candidate": "`totpStep1` in `messages_zh_CN.properties` uses Traditional Chinese characters instead of Simplified Chinese, causing zh_CN users to see mixed script",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: the totpStep1 value in the zh_CN (Simplified Chinese) file uses Traditional Chinese characters instead of Simplified Chinese. Both comments point to the same locale/translation mismatch issue in the same property."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "`totpStep1` in `messages_lt.properties` contains Italian text instead of Lithuanian, causing Lithuanian users to see Italian setup instructions on the authenticator account page"
+        },
+        {
+          "candidate": "`error-invalid-multivalued-size` in account-ui uses `{0}` and ICU choice instead of `{{0}}`, causing i18next to fail interpolation and display literal placeholders"
+        },
+        {
+          "candidate": "`error-invalid-multivalued-size` in admin-ui uses `{0}` instead of `{{0}}`, causing i18next to display literal placeholders instead of interpolating values"
+        },
+        {
+          "candidate": "`end` loop in `verifySafeHtml` can overlap `start` and throw `StringIndexOutOfBoundsException` because it doesn't check `start + end < value.length()` and `start + end < sanitized.length()`"
+        }
+      ],
+      "false_negatives": [
+        {
+          "golden_comment": "The anchor sanitization logic has a potential issue where it consumes English matcher groups without proper validation. If the translated text has more anchor tags than the English text, this could lead to incorrect validation results.",
+          "severity": "Low",
+          "category": "security"
+        },
+        {
+          "golden_comment": "The method name 'santizeAnchors' should be 'sanitizeAnchors' (missing 'i').",
+          "severity": "Low",
+          "category": "style"
+        },
+        {
+          "golden_comment": "Field HTML_TAGS should be declared as 'private static final' following Java naming conventions for constants",
+          "severity": "Low",
+          "category": "style"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 6,
+      "total_golden": 5,
+      "tp": 2,
+      "fp": 4,
+      "fn": 3,
+      "errors_count": 0,
+      "precision": 0.3333333333333333,
+      "recall": 0.4,
+      "tool": "pr-lens",
+      "repo_name": "keycloak__keycloak__pr-lens__PR37429__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/keycloak__keycloak__pr-lens__PR37429__20261109/pull/92"
+    }
+  },
+  "https://github.com/keycloak/keycloak/pull/37634": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "In AccessTokenContext constructor, the fourth Objects.requireNonNull validates grantType twice instead of validating rawTokenId, allowing null rawTokenId values to pass validation.",
+          "severity": "Critical",
+          "category": "bug",
+          "matched_candidate": "AccessTokenContext constructor calls Objects.requireNonNull(grantType, \"Null rawTokenId not allowed\") instead of checking rawTokenId, so null rawTokenId is accepted and produces invalid token ID ending in :null",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same bug as the golden comment: in the AccessTokenContext constructor, the fourth Objects.requireNonNull call validates grantType instead of rawTokenId, which allows null rawTokenId values to pass validation. Both comments point to the same incorrect parameter being validated and the same consequence (null rawTokenId being accepted)."
+        },
+        {
+          "golden_comment": "In isAccessTokenId, the substring for the grant shortcut and the equality check look inverted: the grant shortcut occupies indices 4\u20135 (substring(4,6)), and a match should return true (combined with UUID check), not false.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "isAccessTokenId checks items[0].substring(3, 5) instead of substring(4, 6) and returns false on a match instead of requiring equality, rejecting valid token IDs and passing for incorrect grant types",
+          "confidence": 0.95,
+          "reasoning": "The candidate issue identifies the same two problems as the golden comment: (1) the substring indices are wrong - candidate says it checks (3,5) instead of (4,6), which matches the golden's point that grant shortcut should be at indices 4-5 using substring(4,6), and (2) the return value logic is inverted - returning false on a match instead of true. Both comments identify the same underlying bugs in the isAccessTokenId function."
+        },
+        {
+          "golden_comment": " Catching generic RuntimeException is too broad. The implementation throws IllegalArgumentException specifically - catch that instead for more precise testing.",
+          "severity": "Low",
+          "category": "bug",
+          "matched_candidate": "testIncorrectGrantType passes due to NullPointerException from null sessionFactory because before() never calls postInit, and catch(RuntimeException) swallows the NPE leaving unknown-grant validation unexercised",
+          "confidence": 0.85,
+          "reasoning": "Both comments address the same issue: the test catches RuntimeException which is too broad. The golden comment says to catch IllegalArgumentException specifically. The candidate comment identifies the same problem - that catching RuntimeException is problematic because it swallows other exceptions (like NPE) and leaves the intended validation unexercised. Both are pointing to the same underlying issue of catching too broad an exception type, though the candidate provides more specific context about why this is problematic in this particular test."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "getTokenContextFromTokenId rejects shortcuts that are not exactly two characters because it hardcodes length 6, but encodeTokenId writes whatever getShortcutByGrantType returns, so custom grants with 3-letter shortcuts produce token IDs that cannot be decoded"
+        }
+      ],
+      "false_negatives": [
+        {
+          "golden_comment": "Javadoc mentions \"usually like 3-letters shortcut\" but some implementations use 2-letter shortcuts (\"ac\", \"cc\", \"rt\", \"te\", \"pc\", \"ci\", \"ro\"). Consider updating documentation to reflect actual usage pattern.",
+          "severity": "Low",
+          "category": "doc_defect"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 4,
+      "total_golden": 4,
+      "tp": 3,
+      "fp": 1,
+      "fn": 1,
+      "errors_count": 0,
+      "precision": 0.75,
+      "recall": 0.75,
+      "tool": "pr-lens",
+      "repo_name": "keycloak__keycloak__pr-lens__PR37634__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/keycloak__keycloak__pr-lens__PR37634__20261109/pull/90"
+    }
+  },
+  "https://github.com/keycloak/keycloak/pull/38446": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "After creating the RecoveryAuthnCodesCredentialModel, consider setting its id from the stored credential (e.g., myUser.recoveryCodes.getId()); otherwise getId() will be null and downstream removal by id (e.g., removeStoredCredentialById in the authenticator flow) may not work.",
+          "severity": "Low",
+          "category": "bug",
+          "matched_candidate": "getCredentials builds the recovery model with createFromValues which leaves getId() null, so callers like removeStoredCredentialById receive null and cannot remove the credential",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: the RecoveryAuthnCodesCredentialModel is created without setting its id (via createFromValues), which leaves getId() returning null, causing downstream operations like removeStoredCredentialById to fail. Both comments point to the same bug with the same consequence."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "BackwardsCompatibilityUserStorage.isValid matches recovery codes without removing them, allowing federated users to repeatedly replay spent recovery codes and preventing allCodesUsed() from ever triggering code regeneration"
+        }
+      ],
+      "false_negatives": [
+        {
+          "golden_comment": "Unsafe raw List deserialization without type safety. Calling Optional.get() directly on the Optional returned by RecoveryAuthnCodesUtils.getCredential(user) without checking isPresent() can lead to a NoSuchElementException if the Optional is empty.",
+          "severity": "Medium",
+          "category": "bug"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 2,
+      "total_golden": 2,
+      "tp": 1,
+      "fp": 1,
+      "fn": 1,
+      "errors_count": 0,
+      "precision": 0.5,
+      "recall": 0.5,
+      "tool": "pr-lens",
+      "repo_name": "keycloak__keycloak__pr-lens__PR38446__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/keycloak__keycloak__pr-lens__PR38446__20261109/pull/84"
+    }
+  },
+  "https://github.com/keycloak/keycloak/pull/36882": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [],
+      "false_positives": [],
+      "false_negatives": [
+        {
+          "golden_comment": "Incorrect method call for exit codes. The picocli.exit() method calls System.exit() directly, which is problematic:",
+          "severity": "Medium",
+          "category": "bug"
+        },
+        {
+          "golden_comment": "Need to add changelog/release notes documenting the exit code change and migration guidance",
+          "severity": "Low",
+          "category": "doc_defect"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 0,
+      "total_golden": 2,
+      "tp": 0,
+      "fp": 0,
+      "fn": 2,
+      "errors_count": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "tool": "pr-lens",
+      "repo_name": "keycloak__keycloak__pr-lens__PR36882__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/keycloak__keycloak__pr-lens__PR36882__20261109/pull/92"
+    }
+  },
+  "https://github.com/keycloak/keycloak/pull/36880": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "In getClientsWithPermission(String scope), iterating resourceStore.findByType(server, AdminPermissionsSchema.CLIENTS_RESOURCE_TYPE) and returning resource.getName() will only ever consider the type-level 'Clients' resource (per-client resources have no type) and return its name, while AvailableRoleMappingResource#getRoleIdsWithPermissions expects actual client IDs to pass to realm.getClientById, which can lead to incorrect behavior or a null client and subsequent failures.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "findByType(CLIENTS_RESOURCE_TYPE) misses per-client resources because AdminPermissionsSchema.getOrCreateResource creates per-client resources without a type, so only the realm-wide Clients resource matches instead of actual client IDs",
+          "confidence": 0.95,
+          "reasoning": "The candidate issue identifies the same core problem: findByType(CLIENTS_RESOURCE_TYPE) only matches the realm-wide 'Clients' resource because per-client resources are created without a type, so the method returns the wrong thing (the resource name instead of actual client IDs). This matches the golden comment's concern that iterating resourceStore.findByType() will only consider the type-level 'Clients' resource since per-client resources have no type, leading to incorrect behavior when actual client IDs are expected."
+        },
+        {
+          "golden_comment": "Remove unused getEvaluationContext private method in ClientPermissionsV2 - it is defined but never called",
+          "severity": "Low",
+          "category": "style",
+          "matched_candidate": "Unused private getEvaluationContext method in ClientPermissionsV2 is never called because canExchangeTo throws UnsupportedOperationException, leaving dead code and unused imports",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment - the unused private getEvaluationContext method in ClientPermissionsV2 that is never called. The candidate provides additional context about why it's unused (canExchangeTo throws UnsupportedOperationException) and mentions dead code/unused imports, but the core issue is identical: the getEvaluationContext method is defined but never used and should be removed."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "Javadoc for requireView() and requireViewClientScopes() incorrectly states they return true, but they are void methods that throw ForbiddenException"
+        },
+        {
+          "candidate": "ClientPermissionsV2.canView() omits MANAGE permission check, so users granted only MANAGE on all clients are denied permissions like canView(), canList(), and canViewClientScopes()"
+        },
+        {
+          "candidate": "Javadoc for requireViewClientScopes() claims it returns a boolean but it is a void method that throws ForbiddenException when access is denied"
+        }
+      ],
+      "false_negatives": [
+        {
+          "golden_comment": "Inconsistent feature flag bug causing orphaned permissions. The AdminPermissions event listener, responsible for cleaning up permissions upon role, client, or group removal, is incorrectly guarded by the ADMIN_FINE_GRAINED_AUTHZ (V1) feature flag. This is inconsistent with other methods in the class that use ADMIN_FINE_GRAINED_AUTHZ_V2. Consequently, if ADMIN_FINE_GRAINED_AUTHZ_V2 is enabled but V1 is not, the permission cleanup logic will not execute, leading to orphaned permission data. Cleanup should occur regardless of which fine-grained authorization version is enabled.",
+          "severity": "High",
+          "category": "bug"
+        },
+        {
+          "golden_comment": "In hasPermission(ClientModel client, String scope), the resource lookup uses findByName(server, client.getId(), server.getId()), but AdminPermissionsSchema.getOrCreateResource creates per-client resources with the owner set to resourceServer.getClientId(), so this lookup will never find those resources and will always fall back to the 'all-clients' resource, effectively ignoring client-specific permissions.",
+          "severity": "High",
+          "category": "bug"
+        },
+        {
+          "golden_comment": "In ClientPermissionsV2.hasPermission, the method getResourceTypeResource could return null, leading to a NullPointerException in findByResource. Defensive null checks are needed to prevent this issue.",
+          "severity": "High",
+          "category": "bug"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 6,
+      "total_golden": 5,
+      "tp": 2,
+      "fp": 3,
+      "fn": 3,
+      "errors_count": 0,
+      "precision": 0.3333333333333333,
+      "recall": 0.4,
+      "tool": "pr-lens",
+      "repo_name": "keycloak__keycloak__pr-lens__PR36880__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/keycloak__keycloak__pr-lens__PR36880__20261109/pull/91"
+    }
+  },
+  "https://github.com/keycloak/keycloak/pull/37038": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "In GroupPermissionsV2.canManage(), the permission fallback checks for both VIEW and MANAGE scopes (hasPermission(null, AdminPermissionsSchema.VIEW, AdminPermissionsSchema.MANAGE)), but canManage() should only grant access for MANAGE scope, not VIEW. This means users with only VIEW permission on groups can pass the canManage() check, granting them write access they should not have. The canView() method correctly checks both VIEW and MANAGE, but canManage() should only check MANAGE.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "GroupPermissionsV2.canManage() checks VIEW alongside MANAGE scope, allowing an admin granted only view on the all-groups resource to pass requireManage() and create top-level groups",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: GroupPermissionsV2.canManage() incorrectly checks for VIEW scope alongside MANAGE scope, which allows users with only VIEW permission to pass the canManage() check and gain write access they shouldn't have. Both comments point to the same security vulnerability in the permission fallback logic."
+        },
+        {
+          "golden_comment": "In getGroupIdsWithViewPermission, hasPermission is called with groupResource.getId() and the same groupResource.getId() is added to granted, but hasPermission resolves resources by name (treating the argument as a group id) and the GroupPermissionEvaluator contract says this method returns group IDs that are later used as UserModel.GROUPS and in getUsersCount group filters. This mismatch means per-group VIEW_MEMBERS/MANAGE_MEMBERS permissions may not yield the expected group IDs for filtering and counts, and evaluation may effectively only look at the type-level 'all-groups' resource; consider revisiting whether this should operate on the underlying group ids (resource names) instead so it aligns with the JPA queries and the interface contract.",
+          "severity": "High",
+          "category": "api",
+          "matched_candidate": "getGroupIdsWithViewPermission passes groupResource.getId() to hasPermission and adds it to granted instead of using getName() which holds the group ID, causing findByName to miss the group resource and callers like getUsersCount to receive invalid group IDs",
+          "confidence": 0.95,
+          "reasoning": "The candidate issue identifies the same core problem as the golden comment: in getGroupIdsWithViewPermission, groupResource.getId() is being used both for hasPermission calls and for adding to the granted set, when it should be using getName() (which contains the actual group ID). Both comments point out that this causes hasPermission/findByName to fail to find the correct resource, and that callers like getUsersCount will receive invalid group IDs. The candidate is a more concise version of the same underlying issue."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "Javadoc for requireManageMembers references canManageMembership but the method actually delegates to canManageMembers"
+        }
+      ],
+      "false_negatives": [],
+      "errors": [],
+      "total_candidates": 3,
+      "total_golden": 2,
+      "tp": 2,
+      "fp": 1,
+      "fn": 0,
+      "errors_count": 0,
+      "precision": 0.6666666666666666,
+      "recall": 1.0,
+      "tool": "pr-lens",
+      "repo_name": "keycloak__keycloak__pr-lens__PR37038__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/keycloak__keycloak__pr-lens__PR37038__20261109/pull/79"
+    }
+  },
+  "https://github.com/keycloak/keycloak/pull/33832": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "Returns wrong provider (default keystore instead of BouncyCastle)",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "getBouncyCastleProvider returns the provider of KeyStore.getDefaultType() instead of BouncyCastle, causing BouncyIntegration.PROVIDER to become the wrong provider and operations requesting BouncyCastle algorithms to fail",
+          "confidence": 1.0,
+          "reasoning": "The candidate issue identifies exactly the same problem as the golden comment - that getBouncyCastleProvider returns the wrong provider (the default keystore provider instead of BouncyCastle). The candidate provides more detail about the consequences but points to the identical underlying bug."
+        },
+        {
+          "golden_comment": "Dead code exists where ASN1Encoder instances are created and written to, but their results are immediately discarded. The actual encoding is performed by new ASN1Encoder instances created in the subsequent return statement, rendering the earlier operations useless.",
+          "severity": "Low",
+          "category": "perf",
+          "matched_candidate": "concatenatedRSToASN1DER method has two standalone ASN1Encoder.create().write(...) calls that encode rBigInteger and sBigInteger into discarded encoders, wasting work since the returned bytes come entirely from the subsequent writeDerSeq chain",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies exactly the same problem as the golden comment - ASN1Encoder instances are created and written to (encoding rBigInteger and sBigInteger), but their results are discarded because the actual encoding is done by new ASN1Encoder instances in the return statement. Both comments point to the same dead code/wasted work issue in the concatenatedRSToASN1DER method."
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": [
+        {
+          "golden_comment": "When length starts at -1 from indefinite-length encoding, the arithmetic 'length = length - bytes.length' will behave unexpectedly, potentially leading to incorrect processing of encoded data.",
+          "severity": "Medium",
+          "category": "bug"
+        },
+        {
+          "golden_comment": "Abstract order() method on CryptoProvider may break backward compatibility with existing implementations",
+          "severity": "Low",
+          "category": "speculative"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 2,
+      "total_golden": 4,
+      "tp": 2,
+      "fp": 0,
+      "fn": 2,
+      "errors_count": 0,
+      "precision": 1.0,
+      "recall": 0.5,
+      "tool": "pr-lens",
+      "repo_name": "keycloak__keycloak__pr-lens__PR33832__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/keycloak__keycloak__pr-lens__PR33832__20261109/pull/104"
+    }
+  },
+  "https://github.com/keycloak/keycloak/pull/40940": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "Returning null from getSubGroupsCount() violates the GroupModel contract (Javadoc says it never returns null) and may lead to NPEs in callers that expect a non-null count.",
+          "severity": "Critical",
+          "category": "api",
+          "matched_candidate": "GroupAdapter.getSubGroupsCount() returns null when a group was concurrently removed, violating GroupModel.getSubGroupsCount()'s non-null contract and causing callers that unbox the Long to throw an NPE",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: GroupAdapter.getSubGroupsCount() returns null, which violates the GroupModel contract that specifies it should never return null, and this can cause NPEs in callers. The candidate even provides additional context about when this happens (concurrent removal) and how the NPE occurs (unboxing), but it's fundamentally the same issue."
+        },
+        {
+          "golden_comment": "The reader thread isn\u2019t waited for; flipping deletedAll to true and asserting immediately can race and miss exceptions added just after the flag change, making this test flaky.",
+          "severity": "Medium",
+          "category": "concurrency",
+          "matched_candidate": "createMultiDeleteMultiReadMulti starts an anonymous Thread without calling join() before checking caughtExceptions, so exceptions thrown in the reader thread after deletedAll.set(true) are missed and the test passes anyway",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: the reader thread is not joined/waited for before checking assertions, which means exceptions thrown after deletedAll.set(true) can be missed, making the test flaky. Both comments point to the same race condition bug in the test's thread synchronization."
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": [],
+      "errors": [],
+      "total_candidates": 3,
+      "total_golden": 2,
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "errors_count": 0,
+      "precision": 0.6666666666666666,
+      "recall": 1.0,
+      "tool": "pr-lens",
+      "repo_name": "keycloak__keycloak__pr-lens__PR40940__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/keycloak__keycloak__pr-lens__PR40940__20261109/pull/86"
+    }
+  },
+  "https://github.com/ai-code-review-evaluation/keycloak-greptile/pull/1": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "In UsernameForm.authenticate(), isConditionalPasskeysEnabled() is called without passing the required UserModel parameter.",
+          "severity": "Medium",
+          "category": "api",
+          "matched_candidate": "UsernameForm.authenticate invokes isConditionalPasskeysEnabled() with no arguments, but the only declaration is isConditionalPasskeysEnabled(UserModel user), causing compilation failure",
+          "confidence": 1.0,
+          "reasoning": "The candidate issue identifies exactly the same problem as the golden comment: in UsernameForm.authenticate(), the method isConditionalPasskeysEnabled() is being called without passing the required UserModel parameter. The candidate even provides additional context about the method signature requiring a UserModel user parameter and notes this causes a compilation failure."
+        },
+        {
+          "golden_comment": "With isConditionalPasskeysEnabled(UserModel user) requiring user != null, authenticate(...) will not call webauthnAuth.fillContextForm(context) on the initial login page where context.getUser() is still null, so conditional passkey UI will not be set up for first-time passkey login. Consider whether this should also be enabled when no user has been selected yet so ID-less passkey authentication on the initial login form continues to work.",
+          "severity": "Medium",
+          "category": "speculative",
+          "matched_candidate": "isConditionalPasskeysEnabled returns false when context.getUser() is null, causing webauthnAuth.fillContextForm to be skipped on fresh logins and dropping the conditional passkeys UI",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: isConditionalPasskeysEnabled returns false when user is null (context.getUser() is null), which causes webauthnAuth.fillContextForm to be skipped on fresh/initial logins, resulting in the conditional passkeys UI not being set up. Both comments point to the same bug where ID-less passkey authentication on the initial login form won't work because the conditional passkey UI isn't initialized when no user has been selected yet."
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": [],
+      "errors": [],
+      "total_candidates": 3,
+      "total_golden": 2,
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "errors_count": 0,
+      "precision": 0.6666666666666666,
+      "recall": 1.0,
+      "tool": "pr-lens",
+      "repo_name": "keycloak__keycloak-greptile__pr-lens__PR1__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/keycloak__keycloak-greptile__pr-lens__PR1__20261109/pull/86"
+    }
+  },
+  "https://github.com/getsentry/sentry/pull/93824": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "In the SpanFlusher flush loop, metric tags inconsistently use 'shard' (e.g., in spans.buffer.flusher.produce and spans.buffer.segment_size_bytes) and 'shards' (in spans.buffer.flusher.wait_produce) for the same shard identifier value. This prevents correct metric aggregation across flush stages \u2014 dashboards and alerts filtering by tag 'shard' will miss data tagged as 'shards' and vice versa.",
+          "severity": "Medium",
+          "category": "bug",
+          "matched_candidate": "wait_produce timer tags 'shards' instead of 'shard', inconsistent with produce and segment_size_bytes metrics, breaking dashboard grouping",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies exactly the same problem as the golden comment: the 'wait_produce' timer uses 'shards' as a tag name while other metrics (produce, segment_size_bytes) use 'shard', causing inconsistency that breaks dashboard grouping/aggregation. Both comments point to the same tag naming inconsistency bug in the SpanFlusher metrics."
+        },
+        {
+          "golden_comment": "The test_basic function in test_consumer.py uses a monkeypatched time.sleep that returns immediately, but then calls time.sleep(0.1) expecting it to actually wait.",
+          "severity": "Low",
+          "category": "test_gap",
+          "matched_candidate": "time.sleep(0.1) in test_basic is a no-op because time.sleep is monkeypatched, causing the test to not wait for the flusher thread and potentially race before (msg,) = messages",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies exactly the same problem as the golden comment: the test_basic function uses time.sleep(0.1) but time.sleep has been monkeypatched to return immediately, so the sleep doesn't actually wait. Both comments point out this same underlying bug where the monkeypatched sleep causes the test to not wait as intended."
+        },
+        {
+          "golden_comment": "Because flusher processes are created via multiprocessing.get_context('spawn').Process, they are instances of multiprocessing.context.SpawnProcess, which on POSIX is not a subclass of multiprocessing.Process, so this isinstance check will always be false and hung processes won't be killed here.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "isinstance(process, multiprocessing.Process) is false for SpawnProcess instances created by self.mp_context.Process, so hung processes are never killed before replacements start, allowing duplicate processes to flush the same shards",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: the isinstance(process, multiprocessing.Process) check will always be false for SpawnProcess instances created via the spawn context, meaning hung processes won't be killed. Both comments point to the same bug - the type check failing because SpawnProcess is not a subclass of multiprocessing.Process on POSIX systems."
+        },
+        {
+          "golden_comment": "Sleep in test_consumer.py won\u2019t actually wait because time.sleep was monkeypatched above; consider restoring sleep or using a different sync to ensure the flusher has time to process.",
+          "severity": "Medium",
+          "category": "test_gap",
+          "matched_candidate": "time.sleep(0.1) in test_basic is a no-op because time.sleep is monkeypatched, causing the test to not wait for the flusher thread and potentially race before (msg,) = messages",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: time.sleep(0.1) in the test is ineffective because time.sleep was monkeypatched, which means the test won't actually wait for the flusher thread to process. Both comments point to the same bug - the monkeypatched sleep causing a potential race condition in the test."
+        },
+        {
+          "golden_comment": "Breaking out of the loop when the deadline has elapsed can skip terminating remaining flusher processes, potentially leaving them running after shutdown; consider ensuring termination is attempted even if the deadline is exceeded.",
+          "severity": "Medium",
+          "category": "concurrency",
+          "matched_candidate": "join breaks on timeout before calling process.terminate() on remaining processes, leaving flusher processes running after join returns",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: when the deadline/timeout is reached, the code breaks out of the loop before calling terminate() on the remaining processes, which leaves flusher processes running after the join/shutdown completes. Both comments point to the same bug where early loop termination prevents proper cleanup of remaining processes."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "_create_process_for_shard is never called - dead code with no callers since startup and restart go through _create_process_for_shards"
+        },
+        {
+          "candidate": "get_memory_info is called once per buffer instead of once for the cluster, repeating the cluster INFO scan and inflating used and available metrics by N times on every submit"
+        }
+      ],
+      "false_negatives": [],
+      "errors": [],
+      "total_candidates": 6,
+      "total_golden": 5,
+      "tp": 5,
+      "fp": 2,
+      "fn": 0,
+      "errors_count": 0,
+      "precision": 0.8333333333333334,
+      "recall": 1.0,
+      "tool": "pr-lens",
+      "repo_name": "sentry__sentry__pr-lens__PR93824__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/sentry__sentry__pr-lens__PR93824__20261109/pull/25"
+    }
+  },
+  "https://github.com/ai-code-review-evaluation/sentry-greptile/pull/5": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "Using zip(error_ids, events.values()) assumes the get_multi result preserves the input order; dict value order is not guaranteed to match error_ids, so event data can be paired with the wrong ID (missing nodes also shift alignment).",
+          "severity": "Low",
+          "category": "bug",
+          "matched_candidate": "fetch_error_details zips error_ids with events.values() from nodestore.backend.get_multi by position, so missing or reordered nodes cause ErrorEvent.id to be paired with the wrong error data",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: using zip() with error_ids and events.values() from get_multi is problematic because missing or reordered nodes will cause incorrect pairing between error IDs and event data. Both comments point to the same bug regarding dict value order not being guaranteed to match the input order of error_ids."
+        },
+        {
+          "golden_comment": "Hardcoded empty data passed to TableWidgetVisualization causes it to always render an empty table instead of displaying actual results when the feature flag is enabled.",
+          "severity": "Medium",
+          "category": "bug",
+          "matched_candidate": "tableResultComponent passes empty tableData and columns to TableWidgetVisualization - when use-table-widget-visualization is enabled, it renders with columns={[]} and data: [] instead of result.data and result.meta, so dashboard table widgets show no rows or headers",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: the TableWidgetVisualization component is being passed empty/hardcoded data (columns=[] and data: []) instead of the actual result data (result.data and result.meta), causing the table to render empty when the feature flag is enabled. Both comments point to the same bug with the same root cause and same consequence."
+        },
+        {
+          "golden_comment": "Validation logic incorrectly uses .get('timestamp'), which treats a timestamp of 0 as absent. It should directly check 'timestamp' in self.initial_data to ensure proper field presence detection, preventing both 'age=0' and 'timestamp' from passing mutual-exclusion validation.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "self.initial_data.get(...) treats 0 as absent in BrowserReportSerializer - validate_timestamp and validate_age test the other field by truthiness, so a report containing both age and timestamp skips mutual-exclusion validation when either field is 0",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: using .get() with truthiness checks treats 0 as absent, causing the mutual-exclusion validation to fail when either 'age' or 'timestamp' is 0. Both comments point to the same bug in BrowserReportSerializer's validate_timestamp and validate_age methods, and both explain that this allows reports with both fields to pass validation when one field is 0."
+        },
+        {
+          "golden_comment": "Analytics events are recorded before the feature flag check, resulting in analytics being logged for all requests, including those that return 404 due to the feature being disabled. This can lead to misleading analytics data.",
+          "severity": "Medium",
+          "category": "bug",
+          "matched_candidate": "analytics.record runs before the features.has check and validation in OrganizationPreprodArtifactAssembleEndpoint.post, so rejected requests (404s and 400s) are recorded as assemble attempts and inflate the metric",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment - that analytics.record() is called before the features.has check, causing analytics to be logged for requests that will be rejected (including 404s from disabled features). The candidate even provides more detail by mentioning 400s as well, but the core issue about analytics being recorded before the feature flag check leading to misleading/inflated metrics is identical."
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": [
+        {
+          "golden_comment": "The BrowserReportingCollectorEndpoint returns HttpResponse objects but the endpoint inherits from Endpoint which expects rest_framework.response.Response objects.",
+          "severity": "Medium",
+          "category": "api"
+        },
+        {
+          "golden_comment": "In BaseDetectorTypeValidator.update(), the validator incorrectly updates instance.type using validated_data.get('detector_type') instead of validated_data.get('type').",
+          "severity": "Medium",
+          "category": "bug"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 4,
+      "total_golden": 6,
+      "tp": 4,
+      "fp": 0,
+      "fn": 2,
+      "errors_count": 0,
+      "precision": 1.0,
+      "recall": 0.6666666666666666,
+      "tool": "pr-lens",
+      "repo_name": "sentry__sentry-greptile__pr-lens__PR5__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/sentry__sentry-greptile__pr-lens__PR5__20261109/pull/27"
+    }
+  },
+  "https://github.com/ai-code-review-evaluation/sentry-greptile/pull/1": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "The OptimizedCursorPaginator in organization_auditlogs.py attempts to use negative slice offsets on Django querysets, but Django querysets do not support negative slicing and will raise an AssertionError.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "OptimizedCursorPaginator.get_result slices queryset with negative cursor.offset, causing Django to fail since querysets don't support negative indexing",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: the OptimizedCursorPaginator uses negative slice offsets on Django querysets, which Django doesn't support and will cause an error. Both mention the same class, the same operation (negative slicing/indexing), and the same consequence (Django failure/AssertionError)."
+        },
+        {
+          "golden_comment": "When requests are authenticated with API keys or org auth tokens (which have user_id=None), organization_context.member is None. Line 71 attempts to access organization_context.member.has_global_access without checking if member is None, causing an AttributeError crash when optimized_pagination=true is used, even though the request passed all permission checks with valid org:write scope.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "organization_context.member.has_global_access dereferences a null member without checking if member is None, causing AttributeError for API key and org auth token requests",
+          "confidence": 0.99,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: organization_context.member.has_global_access is accessed without checking if member is None, which causes an AttributeError for API key and org auth token requests. Both comments point to the same null dereference bug on the same code path."
+        },
+        {
+          "golden_comment": "get_item_key assumes a numeric key, but the paginator is used with order_by=-datetime in the audit logs endpoint; calling math.floor/ceil on a datetime will raise a TypeError.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "OptimizedCursorPaginator.get_item_key calls math.floor on a datetime, raising TypeError when ordered by -datetime on non-empty pages",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies exactly the same problem as the golden comment: the OptimizedCursorPaginator.get_item_key method calls math.floor on a datetime value, which will raise a TypeError. Both comments point to the same bug where the paginator assumes numeric keys but is used with datetime ordering in the audit logs endpoint."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "Comment claims negative offsets are allowed when start_offset actually clamps them to zero, making the comment inaccurate"
+        },
+        {
+          "candidate": "value_from_cursor returns the int cursor value unchanged instead of converting to datetime, causing database comparison failures"
+        }
+      ],
+      "false_negatives": [
+        {
+          "golden_comment": "Importing non-existent OptimizedCursorPaginator",
+          "severity": "Low",
+          "category": "bug"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 6,
+      "total_golden": 4,
+      "tp": 3,
+      "fp": 2,
+      "fn": 1,
+      "errors_count": 0,
+      "precision": 0.5,
+      "recall": 0.75,
+      "tool": "pr-lens",
+      "repo_name": "sentry__sentry-greptile__pr-lens__PR1__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/sentry__sentry-greptile__pr-lens__PR1__20261109/pull/27"
+    }
+  },
+  "https://github.com/grafana/grafana/pull/97529": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "A race condition in BuildIndex allows multiple goroutines to concurrently build the same expensive index for the same key. This is caused by moving the b.cacheMu lock from protecting the entire function to only protecting the final cache assignment. ",
+          "severity": "High",
+          "category": "concurrency",
+          "matched_candidate": "BuildIndex no longer blocks concurrent builds of the same key - the lock now covers only the cache write, so two concurrent builds of the same key can both call bleve.New on the same directory, causing errors or corrupting the file-backed index",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: the race condition in BuildIndex caused by moving the lock (b.cacheMu) from protecting the entire function to only protecting the cache write/assignment. Both comments point out that this allows multiple goroutines to concurrently build the same index for the same key, with the candidate adding the specific consequence of concurrent bleve.New calls on the same directory."
+        },
+        {
+          "golden_comment": "Calling s.search.TotalDocs() here may race with concurrent index creation: TotalDocs iterates b.cache without synchronization, and the event watcher goroutine started just above could trigger BuildIndex writes concurrently, potentially causing a concurrent map read/write panic.",
+          "severity": "High",
+          "category": "concurrency",
+          "matched_candidate": "bleveBackend.TotalDocs iterates b.cache without acquiring b.cacheMu, causing potential panic from concurrent map iteration and map write when searchSupport.init starts the watch goroutine",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: TotalDocs() iterates b.cache without synchronization (no lock acquisition), and this races with the watch goroutine that was started which could trigger concurrent map writes via BuildIndex. Both comments point to the same race condition that could cause a concurrent map read/write panic."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "The dbType == \"postgres\" check calls t.Skip before InitializeModuleServer, so the eager NewResourceServer initialization is never tested under postgres and startup failures pass CI unnoticed"
+        }
+      ],
+      "false_negatives": [],
+      "errors": [],
+      "total_candidates": 3,
+      "total_golden": 2,
+      "tp": 2,
+      "fp": 1,
+      "fn": 0,
+      "errors_count": 0,
+      "precision": 0.6666666666666666,
+      "recall": 1.0,
+      "tool": "pr-lens",
+      "repo_name": "grafana__grafana__pr-lens__PR97529__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/grafana__grafana__pr-lens__PR97529__20261109/pull/36"
+    }
+  },
+  "https://github.com/getsentry/sentry/pull/80168": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "MetricAlertDetectorHandler inherits from StatefulDetectorHandler but only contains pass, failing to implement its required abstract methods: counter_names (property), get_dedupe_value(), get_group_key_values(), and build_occurrence_and_event_data(). This will cause a TypeError at runtime when the class is instantiated.",
+          "severity": "High",
+          "category": "api",
+          "matched_candidate": "MetricAlertDetectorHandler subclasses StatefulDetectorHandler without implementing abstract methods counter_names, get_dedupe_value, get_group_key_values, and build_occurrence_and_event_data, causing TypeError when instantiated",
+          "confidence": 1.0,
+          "reasoning": "The candidate issue identifies exactly the same problem as the golden comment: MetricAlertDetectorHandler inherits from StatefulDetectorHandler but doesn't implement the required abstract methods (counter_names, get_dedupe_value, get_group_key_values, and build_occurrence_and_event_data), which will cause a TypeError at runtime when instantiated. The wording is slightly different but the underlying issue is identical."
+        },
+        {
+          "golden_comment": "Docstring says this returns a list of DetectorEvaluationResult, but the method now returns a dict keyed by DetectorGroupKey. Consider updating the docstring to match the new return type.",
+          "severity": "Low",
+          "category": "doc_defect",
+          "matched_candidate": "Docstring in StatefulDetectorHandler.evaluate incorrectly states it returns a list when it actually returns dict[DetectorGroupKey, DetectorEvaluationResult]",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment - that the docstring in StatefulDetectorHandler.evaluate incorrectly states it returns a list when it actually returns a dict keyed by DetectorGroupKey. Both comments point to the same documentation/return type mismatch issue."
+        },
+        {
+          "golden_comment": "Wrong value `6` passed for `group_2` occurrence \u2014 the data packet specifies `\"group_2\": 10`. Should be `10` to accurately reflect the test scenario, which will ensure the test produces the correct occurrence data.",
+          "severity": "Medium",
+          "category": "test_gap",
+          "matched_candidate": "build_mock_occurrence_and_event ignores its value argument, causing test_state_results_multi_group to build expected occurrence for group_2 with 6 instead of the packet's 10",
+          "confidence": 0.95,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: the test is using value 6 for group_2 when it should be 10 according to the data packet. The candidate provides additional context about why this happens (build_mock_occurrence_and_event ignoring its value argument), but it's pointing to the same underlying bug - the wrong value being used for group_2 occurrence."
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": [],
+      "errors": [],
+      "total_candidates": 3,
+      "total_golden": 3,
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "errors_count": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "tool": "pr-lens",
+      "repo_name": "sentry__sentry__pr-lens__PR80168__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/sentry__sentry__pr-lens__PR80168__20261109/pull/6"
+    }
+  },
+  "https://github.com/getsentry/sentry/pull/80528": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "The function modifies the config variable to include display values but then returns the original monitor.config instead of the modified version.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "get_monitor_environment_context updates a copied config but returns monitor_environment.monitor.config, discarding the local config and leaving the raw schedule_type in the occurrence's monitor context",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment. Both point out that the function modifies a local 'config' variable but then returns 'monitor.config' (or 'monitor_environment.monitor.config') instead of the modified version, causing the local changes to be discarded. The candidate even provides additional context about what specific changes are being lost (the display values for schedule_type)."
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": [
+        {
+          "golden_comment": "The code fetches MonitorCheckIn objects by ID when the required data already exists in previous_checkins. This creates an unnecessary database query.",
+          "severity": "Low",
+          "category": "perf"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 1,
+      "total_golden": 2,
+      "tp": 1,
+      "fp": 0,
+      "fn": 1,
+      "errors_count": 0,
+      "precision": 1.0,
+      "recall": 0.5,
+      "tool": "pr-lens",
+      "repo_name": "sentry__sentry__pr-lens__PR80528__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/sentry__sentry__pr-lens__PR80528__20261109/pull/6"
+    }
+  },
+  "https://github.com/getsentry/sentry/pull/77754": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "The AssignmentSource dataclass uses queued: datetime = timezone.now() as a default field value, which evaluates timezone.now() once at class definition time and shares that single datetime instance across all objects.",
+          "severity": "Medium",
+          "category": "concurrency",
+          "matched_candidate": "queued: datetime = timezone.now() evaluates once at module import time, so every AssignmentSource instance built without an explicit value gets the process-start timestamp instead of when the assignment was queued, causing to_dict() and outbound tasks to carry stale values. Should use field(default_factory=timezone.now) instead.",
+          "confidence": 1.0,
+          "reasoning": "Both comments identify the exact same issue: the `queued: datetime = timezone.now()` default value is evaluated once at class/module definition time rather than at instance creation time, causing all instances to share the same datetime value. The candidate even provides the same solution (using field(default_factory=timezone.now)) and explains the practical consequences of the bug."
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": [
+        {
+          "golden_comment": "The method name has a typo: test_from_dict_inalid_data should be test_from_dict_invalid_data.",
+          "severity": "Low",
+          "category": "style"
+        },
+        {
+          "golden_comment": "Method name says 'empty_array' but tests empty dict - consider renaming to 'test_from_dict_empty_dict' for clarity.",
+          "severity": "Low",
+          "category": "style"
+        },
+        {
+          "golden_comment": "to_dict() returns a datetime for queued; if this dict is passed in task kwargs (e.g., via apply_async), JSON serialization may fail depending on the serializer, which can cause enqueue errors.",
+          "severity": "Medium",
+          "category": "bug"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 1,
+      "total_golden": 4,
+      "tp": 1,
+      "fp": 0,
+      "fn": 3,
+      "errors_count": 0,
+      "precision": 1.0,
+      "recall": 0.25,
+      "tool": "pr-lens",
+      "repo_name": "sentry__sentry__pr-lens__PR77754__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/sentry__sentry__pr-lens__PR77754__20261109/pull/6"
+    }
+  },
+  "https://github.com/getsentry/sentry/pull/95633": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [],
+      "false_positives": [
+        {
+          "candidate": "test_thread_queue_parallel_error_handling asserts that offsets are not committed after processing errors, but it exits after only 0.2s while _commit_loop waits 1.0s, so it races the worker's commit and passes vacuously regardless of whether failed offsets are completed"
+        },
+        {
+          "candidate": "FixedQueuePool creates unbounded queue.Queue() instances without a maxsize, so submit never blocks and queues grow without limit under backlog, contradicting SimpleQueueProcessingStrategy's documented backpressure guarantee"
+        },
+        {
+          "candidate": "OrderedQueueWorker.run calls complete_offset in finally after result_processor raises, so failed offsets are marked done and committed instead of retried, contradicting the docstring claim that offsets are only committed after successful processing"
+        },
+        {
+          "candidate": "test_stats_reporting asserts stats['total_items'] > 0 after submitting items while worker threads are already draining the queues, causing the assertion to fail nondeterministically when workers drain them first"
+        },
+        {
+          "candidate": "FixedQueuePool.shutdown sets worker.shutdown = True before calling q.shutdown(immediate=False), causing OrderedQueueWorker.run to exit after its current item and abandon remaining queued messages without completing their offsets"
+        },
+        {
+          "candidate": "Any exception from self.grouping_fn(result) or self.decoder is logged, then the offset is added and completed, so the offset is committed while the message is dropped with no retry and no error surfaced"
+        }
+      ],
+      "false_negatives": [
+        {
+          "golden_comment": "The magic number 50 for max_wait is used repeatedly throughout the tests. Consider extracting this as a named constant to improve maintainability.",
+          "severity": "Low",
+          "category": "style"
+        },
+        {
+          "golden_comment": "The test test_thread_queue_parallel_error_handling has a docstring that doesn't match the test implementation.",
+          "severity": "Low",
+          "category": "doc_defect"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 6,
+      "total_golden": 2,
+      "tp": 0,
+      "fp": 6,
+      "fn": 2,
+      "errors_count": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "tool": "pr-lens",
+      "repo_name": "sentry__sentry__pr-lens__PR95633__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/sentry__sentry__pr-lens__PR95633__20261109/pull/23"
+    }
+  },
+  "https://github.com/ai-code-review-evaluation/sentry-greptile/pull/2": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "OptimizedCursorPaginator's negative-offset branch in get_result() passes cursor.offset directly as start_offset to queryset slicing when enable_advanced_features is True and cursor.offset < 0.",
+          "severity": "Critical",
+          "category": "bug",
+          "matched_candidate": "queryset[start_offset:stop] slices with a negative start_offset when enable_advanced_features is set and cursor.offset < 0, causing Django to reject with ValueError: Negative indexing is not supported",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: when enable_advanced_features is True and cursor.offset < 0, the code passes a negative start_offset to queryset slicing, which Django rejects. The candidate even provides the specific error message (ValueError: Negative indexing is not supported). Both comments point to the same bug in the negative-offset branch of get_result()."
+        },
+        {
+          "golden_comment": "In BasePaginator.get_result(), when cursor.is_prev is True, it sets start_offset = offset without clamping, allowing negative offset values to be passed to queryset slicing.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "BasePaginator.get_result passes negative start_offset to queryset when cursor.is_prev is true and offset < 0, causing AssertionError in Django",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: in BasePaginator.get_result(), when cursor.is_prev is True and offset is negative, the start_offset is set without clamping, allowing negative offset values to be passed to queryset slicing. The candidate even mentions the consequence (AssertionError in Django) which is consistent with the issue of passing negative values to queryset slicing."
+        },
+        {
+          "golden_comment": "OptimizedCursorPaginator.get_item_key uses floor/ceil on a datetime key (order_by='-datetime'), causing TypeError.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "OptimizedCursorPaginator.get_item_key calls math.floor on a datetime value without converting it to a number first, causing TypeError in build_cursor",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment. Both point out that OptimizedCursorPaginator.get_item_key uses math.floor (and the golden also mentions ceil) on a datetime value, which causes a TypeError. The candidate specifically mentions it happens in build_cursor, while the golden mentions the order_by='-datetime' context, but they're describing the same underlying bug - applying math.floor/ceil to datetime objects without proper conversion."
+        },
+        {
+          "golden_comment": "Accessing .has_global_access on organization_context.member can raise an AttributeError when organization_context is None, particularly for non-superuser non-member users.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "organization_context.member.has_global_access dereferences a None member when RpcUserOrganizationContext.member is None for callers without membership, raising AttributeError",
+          "confidence": 0.85,
+          "reasoning": "Both comments identify the same underlying issue: accessing .has_global_access on member can raise an AttributeError when member is None. The golden comment focuses on organization_context being None, while the candidate focuses on organization_context.member being None. Both are pointing to the same null-safety problem - the code doesn't properly handle the case where member doesn't exist, leading to AttributeError. The candidate is slightly more specific about the member being None rather than organization_context, but they're identifying the same fundamental bug."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "Removed max_segment_spans guard in _load_segment_data without replacement, allowing segments with excessive span counts to be loaded"
+        },
+        {
+          "candidate": "add-buffer.lua redirect loop bound dropped from 10000 to 1000, causing redirect chains deeper than 1000 hops to stop early and leave set_span_id unresolved"
+        }
+      ],
+      "false_negatives": [],
+      "errors": [],
+      "total_candidates": 6,
+      "total_golden": 4,
+      "tp": 4,
+      "fp": 2,
+      "fn": 0,
+      "errors_count": 0,
+      "precision": 0.6666666666666666,
+      "recall": 1.0,
+      "tool": "pr-lens",
+      "repo_name": "sentry__sentry-greptile__pr-lens__PR2__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/sentry__sentry-greptile__pr-lens__PR2__20261109/pull/6"
+    }
+  },
+  "https://github.com/ai-code-review-evaluation/sentry-greptile/pull/3": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "Using Python\u2019s built-in hash() to build cache keys is non-deterministic across processes (hash randomization), so keys won\u2019t match across workers and invalidate_upsampling_cache may fail to delete them. Use a deterministic serialization of project_ids for the cache key.",
+          "severity": "Low",
+          "category": "data",
+          "matched_candidate": "hash() in error_upsampling_eligible cache key varies across processes because Python randomizes hash() per process, so workers miss shared cache entries and invalidate_upsampling_cache fails to evict keys set by other processes",
+          "confidence": 1.0,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: using Python's built-in hash() for cache keys is non-deterministic across processes due to hash randomization, which causes cache key mismatches between workers and causes invalidate_upsampling_cache to fail to delete/evict the keys. Both comments point to the same bug with the same root cause and same consequence."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "_is_error_focused_query matches the substring event.type:error without parsing, so negated or compound queries like !event.type:error incorrectly replace count() with upsampled_count() over non-error events without a sample_weight, giving wrong counts"
+        }
+      ],
+      "false_negatives": [
+        {
+          "golden_comment": "In _set_sample_rate_from_error_sampling(), the check `if client_sample_rate:` treats 0.0 as falsy, so a sample_rate of 0.0 is silently skipped and never set on normalized_data.",
+          "severity": "Low",
+          "category": "bug"
+        },
+        {
+          "golden_comment": "The upsampling eligibility check passes the outer dataset instead of the actual dataset used by scoped_dataset. In paths where the query ultimately runs against discover (e.g., dashboard split) while the original dataset is metrics, upsampling may be skipped even when all projects are allowlisted.",
+          "severity": "Medium",
+          "category": "bug"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 2,
+      "total_golden": 3,
+      "tp": 1,
+      "fp": 1,
+      "fn": 2,
+      "errors_count": 0,
+      "precision": 0.5,
+      "recall": 0.3333333333333333,
+      "tool": "pr-lens",
+      "repo_name": "sentry__sentry-greptile__pr-lens__PR3__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/sentry__sentry-greptile__pr-lens__PR3__20261109/pull/19"
+    }
+  },
+  "https://github.com/grafana/grafana/pull/103633": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "The test comment says the cached permissions 'allow access', but the map stores false for dashboards:uid:dash1, so checkPermission will still treat this scope as not allowed.",
+          "severity": "Low",
+          "category": "doc_defect",
+          "matched_candidate": "TestService_CacheCheck sets the cached permission to false, causing checkPermission to deny on its own and assert.False to pass even if permDenialCache is bypassed, leaving the denial cache untested. Should set 'dashboards:uid:dash1': true so the test only passes if permDenialCache produces the denial.",
+          "confidence": 0.95,
+          "reasoning": "Both comments identify the same issue: the test sets the cached permission to false for 'dashboards:uid:dash1', but this means checkPermission will deny access regardless of the permDenialCache, making the test ineffective at testing the denial cache functionality. Both suggest the permission should be set to true so that the denial comes from the permDenialCache rather than the regular permission check."
+        },
+        {
+          "golden_comment": "The cache key construction in `userPermDenialCacheKey` uses simple string concatenation with underscores, which can lead to ambiguous keys and collision risks when any component contains underscores or is empty. This could result in incorrect denial cache hits, affecting user permissions.",
+          "severity": "Medium",
+          "category": "data",
+          "matched_candidate": "Denial cache keys can collide for distinct resource names and folders due to ambiguous underscore separators - (name='a_b', parent='c') and (name='a', parent='b_c') produce the same key, causing a denial for one request to incorrectly deny the other. Should encode each key component unambiguously, such as by length-prefixing values before concatenation.",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment - that the cache key construction using underscore separators can lead to key collisions when components contain underscores. The candidate provides a concrete example showing how (name='a_b', parent='c') and (name='a', parent='b_c') would produce the same key, which is precisely the ambiguity/collision risk mentioned in the golden comment. Both issues point to the same bug in `userPermDenialCacheKey` that could cause incorrect denial cache hits affecting user permissions."
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": [
+        {
+          "golden_comment": "The Check operation exhibits asymmetric cache trust logic: cached permission grants are trusted and returned immediately, but cached denials from the same permission cache are ignored, leading to a fresh database lookup. This allows stale cached grants to provide access to revoked resources, posing a security risk. ",
+          "severity": "High",
+          "category": "security"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 2,
+      "total_golden": 3,
+      "tp": 2,
+      "fp": 0,
+      "fn": 1,
+      "errors_count": 0,
+      "precision": 1.0,
+      "recall": 0.6666666666666666,
+      "tool": "pr-lens",
+      "repo_name": "grafana__grafana__pr-lens__PR103633__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/grafana__grafana__pr-lens__PR103633__20261109/pull/48"
+    }
+  },
+  "https://github.com/getsentry/sentry/pull/67876": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "OAuth state uses pipeline.signature (static) instead of a per-request random value",
+          "severity": "Medium",
+          "category": "security",
+          "matched_candidate": "state = pipeline.signature uses an md5 of pipeline view class names that is identical for every user, so the callback check accepts forged states and provides no CSRF protection",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies exactly the same problem as the golden comment. Both point out that the OAuth state uses pipeline.signature (which is static/identical for every user based on md5 of pipeline view class names) instead of a per-request random value, making it vulnerable to CSRF attacks. The candidate provides more detail about why this is a security issue, but it's fundamentally the same underlying problem."
+        },
+        {
+          "golden_comment": "The code attempts to access integration.metadata[sender][login] without checking for the existence of the sender key. This causes a KeyError for integrations where the sender metadata was not set during creation",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "integration.metadata[\"sender\"][\"login\"] raises KeyError when sender is absent, returning a 500 instead of rendering the error page",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment - that accessing integration.metadata['sender']['login'] will raise a KeyError when the 'sender' key doesn't exist in the metadata. Both comments point to the same bug: missing key validation before accessing nested dictionary keys, which causes an error (KeyError/500) instead of proper error handling."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "test_installation_not_found passes a hardcoded state that mismatches pipeline.signature, so OAuthLoginView returns an error before GitHubInstallation runs and the registered 404 installation stub is never tested"
+        },
+        {
+          "candidate": "safe_urlopen for the token exchange runs before the try that guards safe_urlread, so if GitHub returns an error status or the connection fails, the exception escapes and the user gets a 500 instead of the github-integration-failed page"
+        },
+        {
+          "candidate": "get_user_info calls resp.raise_for_status() outside any try, so a 401 or 5xx from GitHub raises requests.HTTPError, the pipeline 500s, and the user never sees the Invalid installation request dialog"
+        }
+      ],
+      "false_negatives": [
+        {
+          "golden_comment": "Null reference if github_authenticated_user state is missing",
+          "severity": "Medium",
+          "category": "bug"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 5,
+      "total_golden": 3,
+      "tp": 2,
+      "fp": 3,
+      "fn": 1,
+      "errors_count": 0,
+      "precision": 0.4,
+      "recall": 0.6666666666666666,
+      "tool": "pr-lens",
+      "repo_name": "sentry__sentry__pr-lens__PR67876__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/sentry__sentry__pr-lens__PR67876__20261109/pull/17"
+    }
+  },
+  "https://github.com/keycloak/keycloak/pull/32918": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "Cleanup reference uses incorrect alias - should be 'idp-alias-' + i instead of 'alias'.",
+          "severity": "Medium",
+          "category": "bug",
+          "matched_candidate": "Test cleanup removes literal \"alias\" instead of created idp-alias-* providers - cleanup registers testRealm().identityProviders().get(\"alias\")::remove instead of targeting each created IDP alias, causing all 21 created identity providers to leak into testRealm() and cause count assertion failures in subsequent tests",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment - the cleanup code uses the literal string \"alias\" instead of the dynamically created alias names (\"idp-alias-\" + i). The candidate provides more detail about the consequences (leaking 21 identity providers, causing test failures), but it's pointing to the same underlying bug: incorrect alias reference in the cleanup code."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "Cached login results skip organization-aware wrapping - the cache-hit path returns models from session.identityProviders().getById(id) directly while the cache-miss path wraps results with createOrganizationAwareIdentityProviderModel, causing cached results to omit organization-aware behavior"
+        }
+      ],
+      "false_negatives": [
+        {
+          "golden_comment": "InfinispanIdentityProviderStorageProvider.getForLogin() recursively calls session.identityProviders().getById() instead of idpDelegate.getById(), causing the cache lookup to re-enter the same caching layer.",
+          "severity": "Critical",
+          "category": "bug"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 2,
+      "total_golden": 2,
+      "tp": 1,
+      "fp": 1,
+      "fn": 1,
+      "errors_count": 0,
+      "precision": 0.5,
+      "recall": 0.5,
+      "tool": "pr-lens",
+      "repo_name": "keycloak__keycloak__pr-lens__PR32918__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/keycloak__keycloak__pr-lens__PR32918__20261109/pull/105"
+    }
+  },
+  "https://github.com/grafana/grafana/pull/94942": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "The enableSqlExpressions function has flawed logic that always returns false, effectively disabling SQL expressions unconditionally:",
+          "severity": "Critical",
+          "category": "bug",
+          "matched_candidate": "enableSqlExpressions returns false on every path regardless of featuremgmt.FlagSqlExpressions, so ReadQuery rejects every sql query with 'sqlExpressions is not implemented' even when the flag is enabled",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies exactly the same problem as the golden comment - that the enableSqlExpressions function always returns false regardless of the feature flag state, which effectively disables SQL expressions unconditionally. The candidate even provides additional context about the consequence (ReadQuery rejecting queries with 'sqlExpressions is not implemented' error), but it's pointing to the same underlying bug."
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": [
+        {
+          "golden_comment": "The DB methods NewInMemoryDB().RunCommands, DB.QueryFramesInto, and DB.TablesList in pkg/expr/sql/db.go return hardcoded 'not implemented' errors after removing the go-duck dependency.",
+          "severity": "High",
+          "category": "api"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 2,
+      "total_golden": 2,
+      "tp": 1,
+      "fp": 0,
+      "fn": 1,
+      "errors_count": 0,
+      "precision": 0.5,
+      "recall": 0.5,
+      "tool": "pr-lens",
+      "repo_name": "grafana__grafana__pr-lens__PR94942__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/grafana__grafana__pr-lens__PR94942__20261109/pull/11"
+    }
+  },
+  "https://github.com/grafana/grafana/pull/90939": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "The GetWebAssets function implements an incomplete double-checked locking pattern for caching web assets. The function first checks if the cache is populated using a read lock (RLock), and if the cache is empty, it acquires a write lock to populate it. However, it fails to re-check whether the cache was populated by another goroutine while waiting to acquire the write lock.",
+          "severity": "Medium",
+          "category": "concurrency",
+          "matched_candidate": "GetWebAssets does not re-check entryPointAssetsCache after acquiring Lock, causing concurrent cache misses to repeatedly reload assets-manifest.json",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies exactly the same problem as the golden comment - the GetWebAssets function fails to re-check the cache (entryPointAssetsCache) after acquiring the write lock (Lock), which means concurrent goroutines waiting for the lock will all reload the assets-manifest.json instead of using the cache populated by the first goroutine. This is the incomplete double-checked locking pattern described in the golden comment."
+        },
+        {
+          "golden_comment": "In addition to the missing double-check, the function has a critical flaw in its error handling: it unconditionally assigns the fetch result to the cache (line 69: entryPointAssetsCache = result) regardless of whether the fetch succeeded or failed. When an error occurs during asset fetching, result is nil, and this nil value overwrites any previously valid cache entry.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "A failed read can overwrite a valid cache with nil because there is no re-check of the cache after acquiring the lock",
+          "confidence": 0.95,
+          "reasoning": "The candidate issue identifies the same core problem as the golden comment: that a failed read/fetch can overwrite a valid cache with nil. The golden comment explains this in detail (when error occurs, result is nil, and this nil value overwrites valid cache entry), while the candidate states it more concisely (failed read can overwrite valid cache with nil). Both are pointing to the same bug - the unconditional assignment of the fetch result to cache regardless of success/failure."
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": [],
+      "errors": [],
+      "total_candidates": 2,
+      "total_golden": 2,
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "errors_count": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "tool": "pr-lens",
+      "repo_name": "grafana__grafana__pr-lens__PR90939__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/grafana__grafana__pr-lens__PR90939__20261109/pull/11"
+    }
+  },
+  "https://github.com/grafana/grafana/pull/80329": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "The code uses Error log level for what appears to be debugging information. This will pollute error logs in production. Consider using Debug or Info level instead.",
+          "severity": "Low",
+          "category": "perf",
+          "matched_candidate": "Cleanup logs normal batch progress at Error level - Normal batches in CleanAnnotations and CleanOrphanedAnnotationTags call r.log.Error with ids and a nil err, flooding error logs and alerts with routine progress lines",
+          "confidence": 0.95,
+          "reasoning": "Both comments identify the same issue: using Error log level for non-error information (debugging/progress information). The golden comment says Error level is used for 'debugging information' while the candidate specifically identifies 'normal batch progress' being logged at Error level. Both point out this will pollute/flood error logs in production. This is the same underlying concern about inappropriate log level usage."
+        },
+        {
+          "golden_comment": "The cleanup job ticker was changed from 10 minutes to 1 minute, which can lead to increased database load and contention due to more frequent execution of cleanup tasks. This change should be reviewed to ensure it aligns with performance expectations.",
+          "severity": "Low",
+          "category": "perf",
+          "matched_candidate": "time.NewTicker(time.Minute * 1) runs cleanup ten times too often - CleanUpService.Run calls srv.clean every minute instead of every ten, causing all cleanup jobs to run ten times as often while clean can take up to 9 minutes, increasing database load and lock contention",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment - the cleanup job ticker was changed from 10 minutes to 1 minute (time.NewTicker(time.Minute * 1) instead of 10 minutes). Both comments highlight that this causes cleanup tasks to run 10 times more frequently, leading to increased database load and contention. The candidate provides additional detail about the clean function potentially taking up to 9 minutes, but the core issue is identical."
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": [],
+      "errors": [],
+      "total_candidates": 2,
+      "total_golden": 2,
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "errors_count": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "tool": "pr-lens",
+      "repo_name": "grafana__grafana__pr-lens__PR80329__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/grafana__grafana__pr-lens__PR80329__20261109/pull/16"
+    }
+  },
+  "https://github.com/grafana/grafana/pull/90045": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "The context is being created with d.Log instead of the log variable that was initialized with additional context values (name, kind, method). This means those values won't be propagated to the logging context.",
+          "severity": "Medium",
+          "category": "bug",
+          "matched_candidate": "Delete stores d.Log in the context instead of log - Delete calls klog.NewContext(ctx, d.Log) instead of passing log, dropping the name, kind, and method fields from all log lines emitted downstream by d.Storage.Delete",
+          "confidence": 1.0,
+          "reasoning": "The candidate issue identifies exactly the same problem as the golden comment: the code is using d.Log instead of the log variable when creating the context, which means the additional context values (name, kind, method) that were added to the log variable won't be propagated to downstream logging. Both comments point to the same bug with the same explanation of the consequence."
+        },
+        {
+          "golden_comment": "In DualWriterMode3's DeleteCollection method, when a storage operation fails, recordStorageDuration is incorrectly called with recordLegacyDuration instead.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "d.recordStorageDuration called for d.Legacy.DeleteCollection - the legacy DeleteCollection goroutine calls d.recordStorageDuration, so legacy duration and errors are attributed to the storage histogram while the legacy metric receives no observation",
+          "confidence": 0.95,
+          "reasoning": "The candidate issue identifies the same bug as the golden comment. Both point out that in DualWriterMode3's DeleteCollection method, there's a mismatch where the legacy operation incorrectly uses recordStorageDuration instead of recordLegacyDuration. The candidate describes it as 'legacy duration and errors are attributed to the storage histogram' which is the same underlying problem - the wrong recording function is being called for the legacy operation."
+        },
+        {
+          "golden_comment": "Inconsistency: using name instead of options.Kind for metrics recording differs from other methods.",
+          "severity": "Medium",
+          "category": "api",
+          "matched_candidate": "Delete passes name instead of options.Kind to recordStorageDuration - on the success path, Delete calls d.recordStorageDuration with name instead of options.Kind, writing the object name into the kind label and breaking queries grouped by kind",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies exactly the same problem as the golden comment - that Delete uses 'name' instead of 'options.Kind' for metrics recording (specifically in recordStorageDuration). The golden comment notes this as an inconsistency with other methods, and the candidate explains the same issue with additional detail about why it's problematic (breaking queries grouped by kind). Both point to the same underlying bug."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "Create calls recordLegacyDuration on d.Storage.Create failure - when d.Storage.Create fails, storage failures are recorded on the legacy histogram while the storage histogram misses them"
+        },
+        {
+          "candidate": "Update calls recordLegacyDuration when d.Storage.Update fails - storage update errors are recorded on the legacy histogram while the storage histogram receives no error sample"
+        },
+        {
+          "candidate": "Create records storage failure on legacy histogram - when d.Storage.Create fails, Create calls d.recordLegacyDuration with startStorage, so storage failures are attributed to the legacy histogram while the storage histogram misses them"
+        },
+        {
+          "candidate": "Legacy update no longer receives the storage-updated object - the removed code wrapped objInfo with the object returned by Storage.Update; this call passes the original objInfo to legacy instead, so legacy can independently compute an update rather than applying the canonical storage result"
+        }
+      ],
+      "false_negatives": [],
+      "errors": [],
+      "total_candidates": 7,
+      "total_golden": 3,
+      "tp": 3,
+      "fp": 4,
+      "fn": 0,
+      "errors_count": 0,
+      "precision": 0.42857142857142855,
+      "recall": 1.0,
+      "tool": "pr-lens",
+      "repo_name": "grafana__grafana__pr-lens__PR90045__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/grafana__grafana__pr-lens__PR90045__20261109/pull/11"
+    }
+  },
+  "https://github.com/grafana/grafana/pull/106778": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "The rendered GrafanaRuleListItem is missing the required key prop for React list items. This can cause rendering issues when the list order changes.",
+          "severity": "Medium",
+          "category": "bug",
+          "matched_candidate": "GrafanaRuleListItem in FilterView is missing a key prop, causing React to fall back to index reconciliation which can reuse component state across different rules when the list updates",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: the GrafanaRuleListItem component in FilterView is missing a required key prop for React list items. Both comments point out that this missing key can cause rendering/reconciliation issues when the list changes. The candidate provides slightly more technical detail about index reconciliation and state reuse, but it's fundamentally the same issue."
+        },
+        {
+          "golden_comment": "RuleActionsButtons is invoked with only promRule, but SilenceGrafanaRuleDrawer inside RuleActionsButtons still depends on a Grafana Ruler rule being present, so for Grafana rules coming from list views the 'Silence notifications' menu entry (now driven by Grafana Prom abilities) will toggle showSilenceDrawer without ever rendering the drawer. This means clicking 'Silence notifications' for these rules has no visible effect, even when abilities indicate silencing is allowed.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "SilenceGrafanaRuleDrawer never opens when rule is omitted because GrafanaRuleListItem renders RuleActionsButtons with promRule but no rule prop, making rulerRuleType.grafana.alertingRule(rule) always false",
+          "confidence": 0.95,
+          "reasoning": "The candidate issue identifies the same underlying problem as the golden comment. Both describe that: 1) RuleActionsButtons is called with promRule but without the rule prop, 2) SilenceGrafanaRuleDrawer depends on a Grafana Ruler rule being present (rulerRuleType.grafana.alertingRule(rule) check), 3) This causes the 'Silence notifications' functionality to fail - the drawer won't render/open even when the menu entry is shown. The candidate uses slightly different wording ('never opens' vs 'no visible effect') but identifies the exact same bug."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "Delete menu item requires rulerRule alongside canDelete, so in list views where only promRule is provided and rulerRule is undefined, the Delete action is never rendered even when delete permission is granted"
+        },
+        {
+          "candidate": "useAllAlertRuleAbilities drops the isFederatedRuleGroup check because it delegates to useAllRulerRuleAbilities which hardcodes isFederated = false, so federated Mimir rule groups lose their immutability and incorrectly report Update, Delete, and Duplicate as supported"
+        },
+        {
+          "candidate": "createRelativeUrl builds the view href without returnTo from createReturnTo(), so opening a Grafana rule from a filtered list loses the return path and navigating back no longer returns to that list"
+        }
+      ],
+      "false_negatives": [],
+      "errors": [],
+      "total_candidates": 5,
+      "total_golden": 2,
+      "tp": 2,
+      "fp": 3,
+      "fn": 0,
+      "errors_count": 0,
+      "precision": 0.4,
+      "recall": 1.0,
+      "tool": "pr-lens",
+      "repo_name": "grafana__grafana__pr-lens__PR106778__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/grafana__grafana__pr-lens__PR106778__20261109/pull/42"
+    }
+  },
+  "https://github.com/grafana/grafana/pull/107534": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [],
+      "false_positives": [
+        {
+          "candidate": "runSplitQuery maps applyTemplateVariables over request.targets before DataSourceWithBackend.query applies applyTemplateVariables again, causing ad hoc filters on parsed labels to be appended twice and variable values containing $ to be substituted twice"
+        },
+        {
+          "candidate": "runShardSplitQuery calls applyTemplateVariables on targets before passing them to runSplitQuery, which runs applyTemplateVariables again, causing addAdHocFilters to duplicate ad hoc filters on shard sub-requests without deduplication"
+        }
+      ],
+      "false_negatives": [
+        {
+          "golden_comment": "The applyTemplateVariables method is called with request.filters as the third parameter, but this parameter is not used in the corresponding test setup.",
+          "severity": "Low",
+          "category": "test_gap"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 2,
+      "total_golden": 1,
+      "tp": 0,
+      "fp": 2,
+      "fn": 1,
+      "errors_count": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "tool": "pr-lens",
+      "repo_name": "grafana__grafana__pr-lens__PR107534__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/grafana__grafana__pr-lens__PR107534__20261109/pull/52"
+    }
+  },
+  "https://github.com/grafana/grafana/pull/79265": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "Race condition: Multiple concurrent requests could pass the device count check simultaneously and create devices beyond the limit. Consider using a database transaction or lock.",
+          "severity": "High",
+          "category": "concurrency",
+          "matched_candidate": "CreateOrUpdateDevice counts and inserts devices non-atomically - it calls CountDevices and then inserts in a separate session without a lock, so concurrent requests can both read a count below deviceLimit and insert, causing stored devices to exceed the configured limit",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same race condition problem as the golden comment. Both describe how concurrent requests can pass the device count check simultaneously (non-atomic count and insert operations) and create devices beyond the configured limit. The candidate mentions 'non-atomically', 'without a lock', and 'concurrent requests' which directly corresponds to the golden comment's 'race condition' and suggestion to use 'database transaction or lock'."
+        },
+        {
+          "golden_comment": "The `tagDeviceUI` function populates the local cache with the device ID before the `CreateOrUpdateDevice` call. If `ErrDeviceLimitReached` is returned, the cache entry remains set, allowing subsequent requests to bypass the device limit until the cache expires after 29 minutes.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "tagDeviceUI caches the device key before CreateOrUpdateDevice succeeds, so when CreateOrUpdateDevice returns ErrDeviceLimitReached, the next request hits the cache and admits the over-limit device without storing or counting it",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: the tagDeviceUI function caches the device key before CreateOrUpdateDevice succeeds, and when ErrDeviceLimitReached is returned, the cache entry remains, allowing subsequent requests to bypass the device limit. Both comments describe the same bug - premature caching that leads to device limit bypass when the API call fails."
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": [
+        {
+          "golden_comment": "Anonymous authentication now fails entirely if anonDeviceService.TagDevice returns ErrDeviceLimitReached. Previously, device tagging was asynchronous and non-blocking. This change prevents anonymous users from authenticating when the device limit is reached.",
+          "severity": "Medium",
+          "category": "bug"
+        },
+        {
+          "golden_comment": "The updateDevice function returns ErrDeviceLimitReached when rowsAffected == 0, but zero affected rows means the device doesn't exist or falls outside the time window, not that a limit was reached.",
+          "severity": "Low",
+          "category": "doc_defect"
+        },
+        {
+          "golden_comment": "Time window calculation inconsistency: Using device.UpdatedAt.UTC().Add(-anonymousDeviceExpiration) as the lower bound but device.UpdatedAt as the current time may not match the intended logic. Consider using time.Now().UTC() consistently.",
+          "severity": "Low",
+          "category": "bug"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 3,
+      "total_golden": 5,
+      "tp": 2,
+      "fp": 0,
+      "fn": 3,
+      "errors_count": 0,
+      "precision": 0.6666666666666666,
+      "recall": 0.4,
+      "tool": "pr-lens",
+      "repo_name": "grafana__grafana__pr-lens__PR79265__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/grafana__grafana__pr-lens__PR79265__20261109/pull/29"
+    }
+  },
+  "https://github.com/ai-code-review-evaluation/discourse-graphite/pull/9": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [],
+      "false_positives": [],
+      "false_negatives": [
+        {
+          "golden_comment": "The @loaded_locales instance variable in translate_accelerator.rb is lazily initialized and accessed by multiple concurrent threads without synchronization.",
+          "severity": "Low",
+          "category": "concurrency"
+        },
+        {
+          "golden_comment": "Consider normalizing the input locale (e.g., to a symbol) when checking/loading here to avoid double-loading if the same locale is passed as a String vs Symbol (also applies to other locations in the PR).",
+          "severity": "Low",
+          "category": "perf"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 0,
+      "total_golden": 2,
+      "tp": 0,
+      "fp": 0,
+      "fn": 2,
+      "errors_count": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "tool": "pr-lens",
+      "repo_name": "discourse__discourse-graphite__pr-lens__PR9__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/discourse__discourse-graphite__pr-lens__PR9__20261109/pull/6"
+    }
+  },
+  "https://github.com/grafana/grafana/pull/76186": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "The traceID is no longer logged for plugin requests. During a refactoring, the tracing import and the logic to extract and add traceID from the context to log parameters were removed from the LoggerMiddleware. The newly introduced ContextualLoggerMiddleware does not add this information, resulting in missing traceID in plugin request logs and impacting debugging and request tracing capabilities.",
+          "severity": "Low",
+          "category": "bug",
+          "matched_candidate": "LoggerMiddleware.logRequest previously extracted traceID via tracing.TraceIDFromContext and appended it to logParams, but no added line in LoggerMiddleware or ContextualLoggerMiddleware replaces it, so plugin request logs lose traceID",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue directly identifies the same problem as the golden comment: the traceID is no longer being logged for plugin requests because the tracing.TraceIDFromContext logic was removed from LoggerMiddleware and not replaced in either LoggerMiddleware or ContextualLoggerMiddleware. Both comments point to the exact same bug - missing traceID in plugin request logs due to the refactoring."
+        },
+        {
+          "golden_comment": "The `TestLogger.FromContext` method returns a new `TestLogger` instance via `NewTestLogger()` instead of returning the receiver (f). This causes logs to be recorded on an un-referenced instance, leading to broken test assertions that expect logs to be recorded on the original logger.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "TestLogger.FromContext returns a fresh TestLogger instead of the receiver f, so calls like m.logger.FromContext(ctx).Info(...) write to a discarded instance and assertions on InfoLogs or ErrorLogs see nothing",
+          "confidence": 1.0,
+          "reasoning": "The candidate issue identifies exactly the same problem as the golden comment: TestLogger.FromContext returns a new TestLogger instance (via NewTestLogger()) instead of returning the receiver (f), which causes logs to be written to a discarded/un-referenced instance, breaking test assertions that check InfoLogs or ErrorLogs on the original logger."
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": [
+        {
+          "golden_comment": "The ContextualLoggerMiddleware methods (QueryData, CallResource, CheckHealth, CollectMetrics) panic when a nil request is received. This occurs because they directly access req.PluginContext (via the instrumentContext function) without first checking if req is nil. This is a regression, as previous middleware layers gracefully handled nil requests.",
+          "severity": "High",
+          "category": "bug"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 2,
+      "total_golden": 3,
+      "tp": 2,
+      "fp": 0,
+      "fn": 1,
+      "errors_count": 0,
+      "precision": 1.0,
+      "recall": 0.6666666666666666,
+      "tool": "pr-lens",
+      "repo_name": "grafana__grafana__pr-lens__PR76186__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/grafana__grafana__pr-lens__PR76186__20261109/pull/16"
+    }
+  },
+  "https://github.com/ai-code-review-evaluation/discourse-graphite/pull/10": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "The EmbeddableHost model's before_validation callback calls self.host.sub! to strip http://, https://, and path segments, but if self.host is nil, this raises NoMethodError.",
+          "severity": "Critical",
+          "category": "bug",
+          "matched_candidate": "self.host.sub! raises NoMethodError when host is nil - before_validation calls self.host.sub! without checking if host is nil, causing 500 instead of validation error",
+          "confidence": 1.0,
+          "reasoning": "The candidate issue identifies exactly the same problem as the golden comment: the before_validation callback calls self.host.sub! without checking if host is nil, which would raise a NoMethodError. Both comments point to the same bug in the EmbeddableHost model's before_validation callback."
+        },
+        {
+          "golden_comment": "The update and destroy methods in Admin::EmbeddableHostsController do not validate the existence of the EmbeddableHost record retrieved by ID. If EmbeddableHost.where(id: params[:id]).first returns nil (i.e., the host does not exist), attempting to call methods on the nil object (e.g., save_host or destroy) will result in a NoMethodError.",
+          "severity": "Medium",
+          "category": "bug",
+          "matched_candidate": "Unchecked record lookup in update - EmbeddableHost.where(id: params[:id]).first returns nil for unknown id, causing save_host(host) to raise NoMethodError and return 500 instead of 404",
+          "confidence": 0.95,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment - that EmbeddableHost.where(id: params[:id]).first can return nil for unknown IDs, and calling methods on nil (like save_host) will raise NoMethodError. The candidate specifically mentions the update method, which is one of the two methods mentioned in the golden comment (update and destroy). While the candidate doesn't explicitly mention the destroy method, it correctly identifies the core issue for the update method."
+        },
+        {
+          "golden_comment": "record_for_host compares lower(host) = ? but does not normalize the parameter\u2019s case, so mixed\u2011case referer hosts may fail to match even though comparison intends to be case\u2011insensitive.",
+          "severity": "Medium",
+          "category": "bug",
+          "matched_candidate": "where(\"lower(host) = ?\", host) fails to downcase host - record_for_host lowercases the host column but passes uri.host unchanged, so uppercase letters in referer or embed URL fail to match existing EmbeddableHost record",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: the record_for_host method uses lower(host) in the SQL query but doesn't normalize/downcase the host parameter being passed in, causing mixed-case hosts to fail matching. Both comments point to the same bug where case-insensitive comparison is intended but the parameter isn't lowercased."
+        },
+        {
+          "golden_comment": "Because this migration inserts embeddable_hosts rows with raw SQL, any existing embeddable_hosts values that include http:// or /https:// or path segments won\u2019t go through the EmbeddableHost model\u2019s normalization, so the new host lookup (which compares only the bare host) may fail for migrated data. Consider ensuring that migrated hosts are normalized to the same format as newly created EmbeddableHost records so existing embedding configurations keep working.",
+          "severity": "High",
+          "category": "data",
+          "matched_candidate": "Raw SQL INSERT stores unnormalized host values - writes legacy embeddable_hosts values with scheme and path intact instead of running EmbeddableHost#before_validation, so EmbeddableHost.record_for_host fails to match uri.host and embedding is blocked on upgraded sites",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: raw SQL INSERT statements in the migration store embeddable_hosts values without normalization (keeping scheme and path), while the EmbeddableHost model's before_validation hook would normally normalize these. This causes EmbeddableHost.record_for_host to fail matching because it compares against uri.host (bare host) but the stored values contain full URLs. Both comments point to the same bug where migrated data won't work with the new host lookup mechanism."
+        },
+        {
+          "golden_comment": "The contents of `category_fabricator.rb` and `embeddable_host_fabricator.rb` have been swapped, resulting in the loss of original category fabricators and potentially causing errors in fabricator usage.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "Fabricator definitions are swapped between category and embeddable_host files - category_fabricator.rb defines :embeddable_host instead of :category, while embeddable_host_fabricator.rb defines category fabricators",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies exactly the same problem as the golden comment - that the contents of category_fabricator.rb and embeddable_host_fabricator.rb have been swapped. The candidate states that category_fabricator.rb defines :embeddable_host instead of :category, and embeddable_host_fabricator.rb defines category fabricators, which is precisely what the golden comment describes as 'contents have been swapped'."
+        },
+        {
+          "golden_comment": "The migration accesses execute(...)[0]['id'] without checking if the query returned any rows, which causes a crash when no embed_category setting exists. This can lead to a broken feature when attempting to edit category/host relationships.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "execute(...)[0]['id'] raises NoMethodError when embed_category has no row - indexes the query result without checking for rows, so when embed_category is unset or matches no category, execute(...)[0] is nil and dereferencing ['id'] raises NoMethodError",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: accessing execute(...)[0]['id'] without checking if the query returned any rows. Both point out that when no embed_category setting exists, the code will crash because it tries to access an index on an empty/nil result. The candidate even provides more technical detail about the specific error (NoMethodError when dereferencing ['id'] on nil). This is clearly the same underlying bug."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "store.find('fruit', 2) asserts fruit 1's colors - test receives fruits[0] because /fruits/:id pretender ignores requested id, causing test to assert apple's color_ids instead of banana's"
+        },
+        {
+          "candidate": "Unchecked record lookup in destroy - EmbeddableHost.where(id: params[:id]).first returns nil for unknown id, causing host.destroy to raise NoMethodError and return 500 instead of 404"
+        }
+      ],
+      "false_negatives": [
+        {
+          "golden_comment": "The SQL query in the `app/controllers/admin/embeddable_hosts_controller.rb` file uses string interpolation (`'#{h}'`) to insert values, which is vulnerable to SQL injection. It should use parameter binding or proper quoting to prevent this security vulnerability.",
+          "severity": "Critical",
+          "category": "security"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 8,
+      "total_golden": 7,
+      "tp": 6,
+      "fp": 2,
+      "fn": 1,
+      "errors_count": 0,
+      "precision": 0.75,
+      "recall": 0.8571428571428571,
+      "tool": "pr-lens",
+      "repo_name": "discourse__discourse-graphite__pr-lens__PR10__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/discourse__discourse-graphite__pr-lens__PR10__20261109/pull/6"
+    }
+  },
+  "https://github.com/ai-code-review-evaluation/discourse-graphite/pull/7": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "In .topic-meta-data h5 a, the original code had color: scale-color($primary, $lightness: 30%) but was changed to dark-light-choose(scale-color($primary, $lightness: 70%), scale-color($secondary, $lightness: 30%)). The lightness for the light theme changed from 30% to 70%, which is a dramatic inversion",
+          "severity": "Low",
+          "category": "style",
+          "matched_candidate": "dark-light-choose in desktop/topic-post.scss swaps light and dark lightness values - uses 70% lightness for $primary and 30% for $secondary, making .topic-meta-data h5 a too light on light themes and too dark on dark themes",
+          "confidence": 0.95,
+          "reasoning": "The candidate issue identifies the same problem as the golden comment - both point out that in .topic-meta-data h5 a, the dark-light-choose function uses 70% lightness for the light theme (with $primary) and 30% for the dark theme (with $secondary). The golden comment specifically notes the lightness changed from 30% to 70% for light theme, which the candidate describes as 'swaps light and dark lightness values' making it 'too light on light themes'. This is the same underlying issue about the dramatic lightness inversion."
+        },
+        {
+          "golden_comment": "This change for desktop/user.css changes $primary from 30% to 50% for the light theme; most other changes preserve the original $primary value and move the complement to $secondary for dark. Consider reviewing this (also applies to a similar .name change in the mobile variant).",
+          "severity": "Low",
+          "category": "speculative",
+          "matched_candidate": ".group-member-info .name in desktop/user.scss uses 50% lightness for $primary and $secondary instead of 30% and 70%, making group member name too faint in light themes and too bright in dark themes",
+          "confidence": 0.85,
+          "reasoning": "Both comments identify the same issue: the change from 30% to 50% lightness for $primary in the .name styling (specifically in desktop/user.scss/css). The golden comment notes this is a deviation from the pattern where other changes preserve the original $primary value, and the candidate comment specifically calls out that 50% lightness instead of 30% makes the group member name 'too faint in light themes'. Both are flagging the same problematic lightness value change for the .name element."
+        },
+        {
+          "golden_comment": "In topic-post.css the original code used $lightness: 70% but the replacement uses $lightness: 30% for the light theme. This makes the text significantly darker than intended.",
+          "severity": "Low",
+          "category": "bug",
+          "matched_candidate": "dark-light-choose in desktop/topic-post.scss swaps light and dark lightness values - uses 70% lightness for $primary and 30% for $secondary, making .topic-meta-data h5 a too light on light themes and too dark on dark themes",
+          "confidence": 0.9,
+          "reasoning": "The candidate issue identifies the same problem - the lightness values being swapped in the dark-light-choose function. The golden comment specifically notes that 30% is used instead of 70% for light theme, making text darker. The candidate describes this same swap issue, noting 70% for $primary and 30% for $secondary, which results in incorrect lightness on both themes. Both are pointing to the same underlying bug of swapped/incorrect lightness values in the dark-light-choose function."
+        },
+        {
+          "golden_comment": "The light theme color for `.topic-meta-data h5 a` was changed from `scale-color($primary, $lightness: 30%)` to `scale-color($primary, $lightness: 70%)`, which may unintentionally reduce contrast and affect readability. This change should be reviewed to ensure it aligns with design intentions.",
+          "severity": "Medium",
+          "category": "bug",
+          "matched_candidate": "dark-light-choose in desktop/topic-post.scss swaps light and dark lightness values - uses 70% lightness for $primary and 30% for $secondary, making .topic-meta-data h5 a too light on light themes and too dark on dark themes",
+          "confidence": 0.9,
+          "reasoning": "The candidate issue identifies the same problem as the golden comment - the color values for .topic-meta-data h5 a being swapped/changed in a way that affects readability. The golden comment specifically mentions the light theme color changing from 30% to 70% lightness, which would make it too light. The candidate issue describes the same concern about the dark-light-choose function swapping values, making the link 'too light on light themes' - this is the same underlying contrast/readability issue."
+        },
+        {
+          "golden_comment": "In mobile/user.scss line 497, the lightness value for dark themes should be inverted to 70% instead of being changed to 50%. This change may lead to unintended visual regressions in light themes.",
+          "severity": "Medium",
+          "category": "bug",
+          "matched_candidate": ".group-member-info .name in mobile/user.scss uses 50% lightness for $primary and $secondary instead of 30% and 70%, making member names too faint in light themes and too bright in dark themes",
+          "confidence": 0.9,
+          "reasoning": "The candidate issue identifies the same problem in mobile/user.scss regarding the lightness values. Both comments point out that using 50% lightness is incorrect - the golden comment specifically mentions dark themes should use 70% instead of 50%, and the candidate mentions the same issue (should be 30% and 70% instead of 50%). Both also mention the visual regression concern for themes (golden mentions light themes, candidate mentions both light and dark themes). They're addressing the same underlying bug about incorrect lightness values."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "dark-light-choose in mobile/modal.scss swaps light and dark lightness values - passes 30% to $primary and 70% to $secondary, causing .custom-message-length to render too dark in light themes and too light in dark themes"
+        },
+        {
+          "candidate": "dark-light-choose in mobile/topic-post.scss uses 50% lightness for both $primary and $secondary in h3 instead of 20% and 80%, making the heading too faint in light themes and too bright in dark themes"
+        }
+      ],
+      "false_negatives": [],
+      "errors": [],
+      "total_candidates": 5,
+      "total_golden": 5,
+      "tp": 5,
+      "fp": 2,
+      "fn": 0,
+      "errors_count": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "tool": "pr-lens",
+      "repo_name": "discourse__discourse-graphite__pr-lens__PR7__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/discourse__discourse-graphite__pr-lens__PR7__20261109/pull/6"
+    }
+  },
+  "https://github.com/ai-code-review-evaluation/discourse-graphite/pull/8": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "In the next action, capping the next offset at user_count can produce an empty page (e.g., total equal to limit results in offset == total, showing 2/2 with no members). This can cause confusing UX on the last page.",
+          "severity": "Medium",
+          "category": "bug",
+          "matched_candidate": "totalPages computes Math.floor(user_count / limit) + 1, returning one page too many when user_count is a multiple of limit, causing showingLast to stay false and next to load an empty page",
+          "confidence": 0.9,
+          "reasoning": "Both comments identify the same underlying issue: when the user count is a multiple of the limit, the pagination logic causes an empty last page to be displayed. The golden comment focuses on the offset capping producing an empty page, while the candidate focuses on the totalPages calculation being off by one when user_count is a multiple of limit. Both are describing the same bug - the pagination breaks when user_count is exactly divisible by limit, resulting in an empty page being shown."
+        },
+        {
+          "golden_comment": "The remove_member test uses xhr :put to call the remove_member action, but the route defines delete 'members' => 'groups#remove_member' requiring DELETE method.",
+          "severity": "Medium",
+          "category": "api",
+          "matched_candidate": "remove_member spec sends :put instead of :delete, not matching the route definition 'delete \"members\" => \"groups#remove_member\"' in config/routes.rb, so controller tests pass while bypassing routing",
+          "confidence": 1.0,
+          "reasoning": "The candidate issue identifies exactly the same problem as the golden comment: the remove_member test uses PUT method (xhr :put) but the route definition specifies DELETE method ('delete \"members\" => \"groups#remove_member\"'). Both comments point out this HTTP method mismatch between the test and the route configuration."
+        },
+        {
+          "golden_comment": "The `totalPages` calculation using `Math.floor(user_count / limit) + 1` produces an extra page when `user_count` is an exact multiple of `limit`, leading to incorrect pagination. For example, with 100 users and a limit of 50, it reports 3 pages instead of 2, allowing navigation to an empty page.",
+          "severity": "Medium",
+          "category": "bug",
+          "matched_candidate": "totalPages computes Math.floor(user_count / limit) + 1, returning one page too many when user_count is a multiple of limit, causing showingLast to stay false and next to load an empty page",
+          "confidence": 0.99,
+          "reasoning": "The candidate issue identifies the exact same bug as the golden comment: the totalPages calculation using Math.floor(user_count / limit) + 1 produces one extra page when user_count is a multiple of limit. Both comments point out this leads to incorrect pagination behavior (empty page navigation). The candidate adds detail about showingLast staying false, which is a consequence of the same underlying issue."
+        },
+        {
+          "golden_comment": "Expected to return a value at the end of function - code paths without explicit returns will return undefined",
+          "severity": "Medium",
+          "category": "bug",
+          "matched_candidate": "findMembers returns undefined instead of a promise when name is empty, which will throw if any caller chains .then() on findMembers()",
+          "confidence": 0.95,
+          "reasoning": "Both comments identify the same underlying issue: the function has a code path that doesn't return a value (returns undefined). The golden comment states it generically as 'code paths without explicit returns will return undefined'. The candidate comment specifically identifies that 'findMembers returns undefined instead of a promise when name is empty'. Both are pointing to the same problem - missing return statement causing undefined to be returned in certain code paths."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "{{#unless automatic}} evaluates the member instead of the group, leaving automatic undefined and the check always true, which renders the remove link for automatic groups and results in an unhandled 422 upon clicking it"
+        }
+      ],
+      "false_negatives": [
+        {
+          "golden_comment": " The findMembers() call is now asynchronous and unhandled. The controller may not have member data immediately available, creating a race condition.",
+          "severity": "High",
+          "category": "concurrency"
+        },
+        {
+          "golden_comment": "The route provides the group's ID in params[:id], but the code attempts to read it from params[:group_id], causing the action to fail. This results in a broken feature when trying to access group memberships.",
+          "severity": "High",
+          "category": "bug"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 4,
+      "total_golden": 6,
+      "tp": 4,
+      "fp": 1,
+      "fn": 2,
+      "errors_count": 0,
+      "precision": 1.0,
+      "recall": 0.6666666666666666,
+      "tool": "pr-lens",
+      "repo_name": "discourse__discourse-graphite__pr-lens__PR8__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/discourse__discourse-graphite__pr-lens__PR8__20261109/pull/6"
+    }
+  },
+  "https://github.com/ai-code-review-evaluation/discourse-graphite/pull/3": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "The case-sensitive email lookup in `BlockedEmail.should_block?` creates a bypass risk, allowing 'User@Example.com' to bypass a block on 'user@example.com'. This can lead to unauthorized access to blocked users.",
+          "severity": "Critical",
+          "category": "security",
+          "matched_candidate": "BlockedEmail.should_block? looks up the email address case-sensitively without normalizing case, allowing blocked addresses to be bypassed by changing case during signup",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: the BlockedEmail.should_block? method performs case-sensitive email lookup without normalizing case, which allows blocked email addresses to be bypassed by using different letter casing (e.g., 'User@Example.com' vs 'user@example.com'). Both comments point to the same security vulnerability in the same method."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "In createAccount, result.errors.email is truthy for every email error including 'already taken', causing the address to be pushed into rejectedEmails incorrectly, which locks the field and shows 'user.email.invalid' instead of the real error reason"
+        }
+      ],
+      "false_negatives": [
+        {
+          "golden_comment": "BlockedEmail.should_block_email? method has side effects during a read operation - it updates statistics even when just checking if an email should be blocked. This could cause race conditions in concurrent environments and makes the method name misleading.",
+          "severity": "Medium",
+          "category": "concurrency"
+        },
+        {
+          "golden_comment": "The regex pattern @(#{domains}) in email_in_restriction_setting? method only matches domain suffixes, not full domains with proper boundary anchoring. An attacker can register evil.example.com to bypass a whitelist entry for example.com.",
+          "severity": "Medium",
+          "category": "bug"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 2,
+      "total_golden": 3,
+      "tp": 1,
+      "fp": 1,
+      "fn": 2,
+      "errors_count": 0,
+      "precision": 0.5,
+      "recall": 0.3333333333333333,
+      "tool": "pr-lens",
+      "repo_name": "discourse__discourse-graphite__pr-lens__PR3__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/discourse__discourse-graphite__pr-lens__PR3__20261109/pull/6"
+    }
+  },
+  "https://github.com/ai-code-review-evaluation/discourse-graphite/pull/5": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "-ms-align-items never existed in any version of IE/Edge; the correct legacy property is -ms-flex-align.",
+          "severity": "Low",
+          "category": "bug",
+          "matched_candidate": "align-items mixin emits -ms-align-items which is not a valid CSS property and no browser implements it, leaving dead code while IE10 is already handled by -ms-flex-align on the preceding line",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: that -ms-align-items is not a valid CSS property and was never implemented by any browser, while -ms-flex-align is the correct legacy property. Both comments point out that -ms-align-items never existed and that -ms-flex-align is the proper alternative."
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": [
+        {
+          "golden_comment": "Mixing float: left with flexbox causes layout issues. Further this PR removes the float-based right alignment for .d-header .panel, which may cause the login panel in the non-Ember/noscript header (where .panel is nested inside .row and not a flex item) to stack under the title instead of remaining right-aligned.",
+          "severity": "Low",
+          "category": "bug"
+        },
+        {
+          "golden_comment": "-webkit-box-ordinal-group and -moz-box-ordinal-group require values starting from 1, not 0. If $val is 0, this will cause incorrect rendering in older browsers, leading to layout issues.",
+          "severity": "Medium",
+          "category": "bug"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 1,
+      "total_golden": 3,
+      "tp": 1,
+      "fp": 0,
+      "fn": 2,
+      "errors_count": 0,
+      "precision": 1.0,
+      "recall": 0.3333333333333333,
+      "tool": "pr-lens",
+      "repo_name": "discourse__discourse-graphite__pr-lens__PR5__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/discourse__discourse-graphite__pr-lens__PR5__20261109/pull/6"
+    }
+  },
+  "https://github.com/ai-code-review-evaluation/discourse-graphite/pull/6": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "The include_website_name method is missing the required ? suffix. Rails serializers expect include_ methods to end with ? for conditional attribute inclusion, a convention followed by other methods in this serializer. Without it, the website_name attribute may not be conditionally included as intended. Additionally, the '.' << website_host string concatenation should be replaced with '.' + website_host or '.#{website_host}' to avoid mutating string literals, which can lead to issues.",
+          "severity": "Medium",
+          "category": "api",
+          "matched_candidate": "include_website_name is missing the ? so it is never called - the method lacks the ? required by ActiveModel::Serializer, making it dead code and website_name is always serialized even when website is blank or untrusted",
+          "confidence": 0.9,
+          "reasoning": "The candidate issue correctly identifies the same core problem as the golden comment: the include_website_name method is missing the required '?' suffix that Rails/ActiveModel::Serializer expects for conditional attribute inclusion. Both comments point out that without the '?', the method won't be called as intended. The candidate doesn't mention the string concatenation issue ('.' << website_host), but it does identify the primary issue about the missing '?' suffix."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "website_name bypasses the untrusted_attributes guard on website - because website_name is only in attributes and not in untrusted_attributes, anonymous viewers of a TL0 profile receive the host and path derived from website, which scope.restrict_user_fields? was meant to hide"
+        }
+      ],
+      "false_negatives": [],
+      "errors": [],
+      "total_candidates": 2,
+      "total_golden": 1,
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "errors_count": 0,
+      "precision": 0.5,
+      "recall": 1.0,
+      "tool": "pr-lens",
+      "repo_name": "discourse__discourse-graphite__pr-lens__PR6__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/discourse__discourse-graphite__pr-lens__PR6__20261109/pull/6"
+    }
+  },
+  "https://github.com/ai-code-review-evaluation/discourse-graphite/pull/4": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "The current origin validation using indexOf is insufficient and can be bypassed. An attacker could use a malicious domain like evil-discourseUrl.com to pass this check.",
+          "severity": "Medium",
+          "category": "security",
+          "matched_candidate": "`discourseUrl.indexOf(e.origin)` allows substring and prefix origins - postMessageReceived checks that discourseUrl contains e.origin, allowing foreign pages whose origin is a substring to send discourse-resize messages",
+          "confidence": 0.95,
+          "reasoning": "The candidate issue identifies the same security vulnerability as the golden comment. Both point out that using indexOf for origin validation is insecure because it allows substring matching. The golden comment gives the example of 'evil-discourseUrl.com' bypassing the check, while the candidate describes it as allowing 'foreign pages whose origin is a substring to send discourse-resize messages'. Both are describing the same origin validation bypass vulnerability."
+        },
+        {
+          "golden_comment": "The ERB block closes with end if, which is invalid Ruby/ERB and will raise at render; it should just be end to close the if block.",
+          "severity": "Medium",
+          "category": "bug",
+          "matched_candidate": "`<%- end if %>` in `best.html.erb` is invalid Ruby syntax - template compilation fails and GET /embed/best raises a syntax error instead of rendering",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment - the invalid `end if` syntax in the ERB template. Both point out that `<%- end if %>` is invalid Ruby/ERB syntax that will cause an error at render time. The candidate even specifies the file (best.html.erb) and the consequence (syntax error instead of rendering), which aligns perfectly with the golden comment's description."
+        },
+        {
+          "golden_comment": "Calling `i.content.scrub` assumes that `i.content` is always populated. However, many RSS feeds do not provide a `content` field, leading to a potential nil pointer exception when `i.content` is nil. A fallback to `description` should be implemented to prevent crashes.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "Calling `i.content.scrub` directly crashes when `i.content` is nil - poll_feed calls i.content.scrub without checking for nil when items only carry <description>, raising a NoMethodError that aborts the feed import",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: calling `i.content.scrub` directly without checking if `i.content` is nil, which causes a crash/error when RSS feed items only have a description field instead of content. Both issues point to the same bug - the nil pointer exception when content is not populated in RSS feeds."
+        },
+        {
+          "golden_comment": "An unescaped request header (request.referer) is interpolated into JavaScript without proper escaping, which can lead to XSS vulnerabilities if the referer contains malicious content. This issue can allow attackers to execute arbitrary scripts in the context of the application.",
+          "severity": "Critical",
+          "category": "security",
+          "matched_candidate": "`'<%= request.referer %>'` injected raw into the layout JavaScript - Referer header written straight into single-quoted JS string allows XSS with referer like http://eviltrout.com/';alert(1)//",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same vulnerability as the golden comment - an unescaped request.referer header being interpolated into JavaScript code, creating an XSS vulnerability. The candidate even provides a specific example of how the attack could work (referer like http://eviltrout.com/';alert(1)//), which demonstrates understanding of the same security issue."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "`poll_feed_spec` examples leave `feed_polling_enabled?` false - Jobs::PollFeed#execute short-circuits on default false SiteSetting.feed_polling_enabled?, so poll_feed is never reached and tests pass even if checks are deleted"
+        },
+        {
+          "candidate": "`TopicEmbed.import_remote` calls `open(url)` without `open-uri` - Kernel#open treats the embed URL as a file path and raises Errno::ENOENT, causing HTTP embedding imports to fail"
+        },
+        {
+          "candidate": "`post.created_at.strftime(\"%e %b %Y\")` ignores the viewer's locale and time zone - formats dates using server's time zone and English month names"
+        }
+      ],
+      "false_negatives": [
+        {
+          "golden_comment": "The PollFeed job calls open(SiteSetting.feed_polling_url) without validating the URL, allowing an attacker who controls the feed_polling_url site setting to make the server fetch arbitrary internal or external URLs.",
+          "severity": "Critical",
+          "category": "security"
+        },
+        {
+          "golden_comment": "postMessage targetOrigin should be the origin (scheme+host+port), not the full referrer URL; using the full URL will cause the message to be dropped and prevent resizing.",
+          "severity": "Medium",
+          "category": "security"
+        },
+        {
+          "golden_comment": "The code sets X-Frame-Options: ALLOWALL which completely disables clickjacking protection. The referer validation can be bypassed (referer headers are easily spoofed), and the fallback to empty string for nil referer masks validation failures.",
+          "severity": "Medium",
+          "category": "security"
+        },
+        {
+          "golden_comment": "The TopicEmbed.import method is susceptible to a NoMethodError if the contents parameter is nil when attempting to append a string, and an XSS vulnerability due to unescaped url interpolation in the generated HTML.",
+          "severity": "Medium",
+          "category": "bug"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 7,
+      "total_golden": 8,
+      "tp": 4,
+      "fp": 3,
+      "fn": 4,
+      "errors_count": 0,
+      "precision": 0.5714285714285714,
+      "recall": 0.5,
+      "tool": "pr-lens",
+      "repo_name": "discourse__discourse-graphite__pr-lens__PR4__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/discourse__discourse-graphite__pr-lens__PR4__20261109/pull/6"
+    }
+  },
+  "https://github.com/ai-code-review-evaluation/discourse-graphite/pull/1": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "The downsize method is defined twice. The second definition, which expects a single dimensions string parameter, overrides the first, which expected separate max_width and max_height parameters. This makes the original method unreachable and breaks existing code that calls it with separate width and height arguments.",
+          "severity": "Medium",
+          "category": "bug",
+          "matched_candidate": "Second `def self.downsize` overwrites the numeric `max_width, max_height` definition, causing callers like `ResizeEmoji` to raise an error and fail to resize emoji",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: the second `def self.downsize` method definition overwrites/overrides the first one. Both comments point out that this causes the original method (with max_width, max_height parameters) to become unreachable, breaking existing code that calls it with separate width and height arguments. The candidate even provides a specific example (ResizeEmoji) of code that would break."
+        },
+        {
+          "golden_comment": "Hardcoding maxSizeKB = 10 * 1024 ignores Discourse.SiteSettings['max_' + type + '_size_kb'], so the client-side limit can diverge from server-side and per-type settings (also applies to the 413 handler below).",
+          "severity": "Low",
+          "category": "bug",
+          "matched_candidate": "`validateUploadedFile` hardcodes 10 MB instead of using site settings (`Discourse.SiteSettings['max_' + type + '_size_kb']`), so attachments exceeding `max_attachment_size_kb` pass the client check and are rejected later by the server",
+          "confidence": 0.95,
+          "reasoning": "Both comments identify the same issue: the validateUploadedFile function hardcodes a 10 MB limit instead of using the dynamic site settings (Discourse.SiteSettings['max_' + type + '_size_kb']). Both point out that this causes a mismatch between client-side and server-side validation, where files that pass client validation may be rejected by the server. The candidate issue is essentially the same as the golden comment, just with slightly different wording."
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": [
+        {
+          "golden_comment": "Passing 80% as the dimensions can fail for animated GIFs when allow_animated_thumbnails is true, since the animated path uses gifsicle --resize-fit which expects WxH geometry, not a percentage; downsizing would then silently fail.",
+          "severity": "Medium",
+          "category": "data"
+        },
+        {
+          "golden_comment": "The loop checking `tempfile.size` may never terminate correctly due to stale cached size, leading to potential infinite loops or incorrect file handling after modifications.",
+          "severity": "Medium",
+          "category": "bug"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 2,
+      "total_golden": 4,
+      "tp": 2,
+      "fp": 0,
+      "fn": 2,
+      "errors_count": 0,
+      "precision": 1.0,
+      "recall": 0.5,
+      "tool": "pr-lens",
+      "repo_name": "discourse__discourse-graphite__pr-lens__PR1__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/discourse__discourse-graphite__pr-lens__PR1__20261109/pull/6"
+    }
+  },
+  "https://github.com/ai-code-review-evaluation/discourse-graphite/pull/2": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "logic: Potential nil pointer exception - if no TopicUser record exists, tu will be nil and calling methods on it will crash",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "TopicsController#unsubscribe calls tu.notification_level without guarding against nil tu from TopicUser.find_by or nil notification_level, causing NoMethodError and 500 error when clicking unsubscribe link",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment - that TopicUser.find_by can return nil, and calling methods on the nil tu object (specifically notification_level) will cause an error. The candidate provides more specific details (NoMethodError, 500 error, unsubscribe link context) but it's fundamentally the same nil pointer/nil object issue."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "unsubscribe route is a plain GET that skips CSRF protection, allowing external pages to embed /t/:topic_id/unsubscribe to silently change notification levels for logged-in users"
+        },
+        {
+          "candidate": "unsubscribe_link in server.en.yml unconditionally interpolates %{unsubscribe_url}, so any Email::MessageBuilder caller with add_unsubscribe_link: true that omits unsubscribe_url raises I18n::MissingInterpolationArgument"
+        }
+      ],
+      "false_negatives": [
+        {
+          "golden_comment": "Typo in property name: 'stopNotificiationsText' should be 'stopNotificationsText' (missing 'n' in 'Notifications')",
+          "severity": "Low",
+          "category": "style"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 3,
+      "total_golden": 2,
+      "tp": 1,
+      "fp": 2,
+      "fn": 1,
+      "errors_count": 0,
+      "precision": 0.3333333333333333,
+      "recall": 0.5,
+      "tool": "pr-lens",
+      "repo_name": "discourse__discourse-graphite__pr-lens__PR2__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/discourse__discourse-graphite__pr-lens__PR2__20261109/pull/6"
+    }
+  },
+  "https://github.com/calcom/cal.com/pull/22532": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "logic: macOS-specific sed syntax with empty string after -i flag will fail on Linux systems",
+          "severity": "Low",
+          "category": "bug",
+          "matched_candidate": "sed -i '' uses BSD/macOS syntax that fails on Linux GNU sed, leaving GOOGLE_WEBHOOK_URL in env file unchanged",
+          "confidence": 0.98,
+          "reasoning": "Both comments identify the exact same issue: the sed -i '' syntax is macOS/BSD-specific and will fail on Linux systems which use GNU sed. The candidate provides slightly more detail about the consequence (GOOGLE_WEBHOOK_URL remaining unchanged) but the core issue is identical."
+        },
+        {
+          "golden_comment": "Throwing a generic Error for authentication failures results in a 500 response in tRPC. Instead, it should return a structured TRPCError with an appropriate code, such as FORBIDDEN, to accurately reflect the error type.",
+          "severity": "High",
+          "category": "api",
+          "matched_candidate": "deleteCacheHandler throws a plain Error instead of TRPCError when credential is missing or access is denied, causing 500 INTERNAL_SERVER_ERROR instead of 404 or 403",
+          "confidence": 0.95,
+          "reasoning": "The candidate issue identifies the same underlying problem as the golden comment: throwing a plain/generic Error instead of TRPCError for authentication/authorization failures, which results in incorrect HTTP status codes (500 instead of appropriate error codes like 403/404). Both comments point to the same bug - using generic Error instead of structured TRPCError with appropriate codes for credential/access issues."
+        },
+        {
+          "golden_comment": "Date is formatted with hardcoded 'en-US' locale instead of using the user's locale from useLocale, which can lead to incorrect date representation for users in different locales.",
+          "severity": "Medium",
+          "category": "bug",
+          "matched_candidate": "Intl.DateTimeFormat uses hard-coded 'en-US' locale and no timeZone, ignoring user's profile locale and time zone settings",
+          "confidence": 0.95,
+          "reasoning": "The candidate issue identifies the same core problem as the golden comment - that Intl.DateTimeFormat uses a hard-coded 'en-US' locale instead of using the user's locale settings. The candidate also mentions the timeZone issue which is additional detail, but the main concern about the hardcoded locale ignoring user preferences is the same underlying issue."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "deleteCacheMutation does not invalidate connectedCalendars - only calls onSuccess without invalidating utils.viewer.calendars.connectedCalendars, so deleted cache status and timestamp remain displayed until manual refresh"
+        },
+        {
+          "candidate": "new CalendarCacheRepository() is instantiated directly bypassing CalendarCache.init feature gate, so when calendar-cache feature is disabled the real repository still queries CalendarCache table instead of using CalendarCacheRepositoryMock"
+        }
+      ],
+      "false_negatives": [
+        {
+          "golden_comment": "The updateManyByCredentialId call uses an empty data object, which prevents Prisma's @updatedAt decorator from updating the updatedAt timestamp. This results in inaccurate cache status tracking, as the timestamp isn't updated when the cache is refreshed. To fix this, explicitly set the updatedAt field.",
+          "severity": "Medium",
+          "category": "bug"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 5,
+      "total_golden": 4,
+      "tp": 3,
+      "fp": 2,
+      "fn": 1,
+      "errors_count": 0,
+      "precision": 0.6,
+      "recall": 0.75,
+      "tool": "pr-lens",
+      "repo_name": "cal_dot_com__cal.com__pr-lens__PR22532__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/cal_dot_com__cal.com__pr-lens__PR22532__20261109/pull/6"
+    }
+  },
+  "https://github.com/calcom/cal.com/pull/8330": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "Incorrect end time calculation using slotStartTime instead of slotEndTime",
+          "severity": "Medium",
+          "category": "bug",
+          "matched_candidate": "`end` is computed from `slotStartTime` instead of `slotEndTime`, causing `end > workingHour.endTime` to compare the slot's start time and allowing slots that start inside working hours but end after `workingHour.endTime` to be offered as available",
+          "confidence": 1.0,
+          "reasoning": "The candidate issue identifies exactly the same bug as the golden comment - that the end time calculation incorrectly uses slotStartTime instead of slotEndTime. The candidate provides additional context about the consequences of this bug (allowing slots that end after working hours), but it's pointing to the same underlying issue."
+        },
+        {
+          "golden_comment": "Using === for dayjs object comparison will always return false as it compares object references, not values. Use .isSame() method instead: dayjs(date.start).add(utcOffset, 'minutes').isSame(dayjs(date.end).add(utcOffset, minutes))",
+          "severity": "Medium",
+          "category": "bug",
+          "matched_candidate": "`dayjs` objects compared with `===` checks object references rather than time equality, so the zero-length date override branch never executes and unavailable days can still show slots as available",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: using === to compare dayjs objects compares object references rather than values/time equality. Both point out that this comparison will not work as intended because dayjs objects are compared by reference, not by their underlying time values. The candidate also correctly identifies the consequence (the zero-length date override branch never executes)."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "`checkIfIsAvailable` returns `true` early when `dateOverrideExist` matches without running `busy.every` check, allowing a host with an existing booking in that date override to be double booked"
+        }
+      ],
+      "false_negatives": [],
+      "errors": [],
+      "total_candidates": 3,
+      "total_golden": 2,
+      "tp": 2,
+      "fp": 1,
+      "fn": 0,
+      "errors_count": 0,
+      "precision": 0.6666666666666666,
+      "recall": 1.0,
+      "tool": "pr-lens",
+      "repo_name": "cal_dot_com__cal.com__pr-lens__PR8330__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/cal_dot_com__cal.com__pr-lens__PR8330__20261109/pull/6"
+    }
+  },
+  "https://github.com/calcom/cal.com/pull/14943": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "The deletion logic in scheduleSMSReminders.ts incorrectly deletes non-SMS workflow reminders (e.g., Email, WhatsApp) that have retryCount > 1. This occurs because the retryCount condition within the OR clause for deletion lacks a method: WorkflowMethods.SMS filter, causing it to apply to all reminder types instead of only SMS reminders, which is the intended scope of this function.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "deleteMany filters on retryCount without method: WorkflowMethods.SMS in its second OR branch, so the SMS cron deletes EMAIL and WHATSAPP WorkflowReminder rows that reach that retry count before their own handlers run",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies exactly the same bug as the golden comment: the deleteMany operation's second OR branch (retryCount condition) lacks a method: WorkflowMethods.SMS filter, causing it to incorrectly delete EMAIL and WHATSAPP workflow reminders instead of only SMS reminders. Both comments point to the same underlying logic error in the deletion query."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "twilio.scheduleSMS returns undefined when isLockedForSMSSending is true, but the else branch increments retryCount without attempting a send, causing deleteMany to permanently delete pending reminders after two cron runs"
+        },
+        {
+          "candidate": "catch block wraps the entire loop body, so non-send failures such as database, configuration, rate-limit, or template errors increment retryCount, causing transient failures to trigger reminder deletion"
+        }
+      ],
+      "false_negatives": [
+        {
+          "golden_comment": "Using retryCount: reminder.retryCount + 1 reads a possibly stale value and can lose increments under concurrency; consider an atomic increment via Prisma (increment: 1) to avoid race conditions (also applies to the similar update in the catch block).",
+          "severity": "High",
+          "category": "concurrency"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 3,
+      "total_golden": 2,
+      "tp": 1,
+      "fp": 2,
+      "fn": 1,
+      "errors_count": 0,
+      "precision": 0.3333333333333333,
+      "recall": 0.5,
+      "tool": "pr-lens",
+      "repo_name": "cal_dot_com__cal.com__pr-lens__PR14943__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/cal_dot_com__cal.com__pr-lens__PR14943__20261109/pull/6"
+    }
+  },
+  "https://github.com/calcom/cal.com/pull/22345": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [],
+      "false_positives": [],
+      "false_negatives": [
+        {
+          "golden_comment": "In getBaseConditions(), the else if (filterConditions) and final else branches are unreachable. This is because getAuthorizationConditions() always returns a non-null Prisma.Sql object, making authConditions always truthy, which means only the first two if/else if conditions are ever evaluated.",
+          "severity": "Low",
+          "category": "bug"
+        },
+        {
+          "golden_comment": "Fetching userIdsFromOrg only when teamsFromOrg.length > 0 can exclude org-level members for orgs without child teams; consider deriving from teamIds (which includes orgId) or removing the guard so org-only orgs still include member user bookings.",
+          "severity": "Medium",
+          "category": "speculative"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 0,
+      "total_golden": 2,
+      "tp": 0,
+      "fp": 0,
+      "fn": 2,
+      "errors_count": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "tool": "pr-lens",
+      "repo_name": "cal_dot_com__cal.com__pr-lens__PR22345__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/cal_dot_com__cal.com__pr-lens__PR22345__20261109/pull/6"
+    }
+  },
+  "https://github.com/calcom/cal.com/pull/11059": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "The Zod schema in parseRefreshTokenResponse uses computed property keys [z.string().toString()] and [z.string().optional().toString()] in minimumTokenResponseSchema, which is invalid Zod syntax and will throw a runtime error.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "Computed keys using [z.string().toString()] in minimumTokenResponseSchema evaluate to literal string keys rather than an index signature, causing zod to strip numeric expiry fields from sync response",
+          "confidence": 0.85,
+          "reasoning": "Both comments identify the same issue: the use of computed property keys [z.string().toString()] in minimumTokenResponseSchema is problematic. The golden comment says it's 'invalid Zod syntax and will throw a runtime error', while the candidate says the computed keys 'evaluate to literal string keys rather than an index signature'. Both are pointing to the same fundamental problem with the Zod schema syntax using computed property keys, though they describe the consequence slightly differently (runtime error vs incorrect behavior). The core issue identified is the same."
+        },
+        {
+          "golden_comment": "parseRefreshTokenResponse returns a Zod safeParse result ({ success, data, error }), not the credential key object. Persisting that as key stores the wrapper instead of the token payload; we should store the parsed data or use schema parse.",
+          "severity": "High",
+          "category": "data",
+          "matched_candidate": "parseRefreshTokenResponse result ({ success, data } wrapper object) is saved directly as credential key instead of just the data, causing googleCredentialSchema.parse to fail",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: parseRefreshTokenResponse returns a safeParse result wrapper object ({ success, data }) but this wrapper is being saved directly as the credential key instead of extracting just the data property. Both comments point out that this causes issues - the golden mentions storing 'the wrapper instead of the token payload' and the candidate mentions it will cause 'googleCredentialSchema.parse to fail'. This is the same underlying bug."
+        },
+        {
+          "golden_comment": "When APP_CREDENTIAL_SHARING_ENABLED and CALCOM_CREDENTIAL_SYNC_ENDPOINT are set, the refreshFunction helper returns the fetch Response, but several callers (for example GoogleCalendarService.refreshAccessToken expecting res.data, and HubspotCalendarService.refreshAccessToken expecting a HubspotToken) assume it returns the integration-specific token object. That mismatch will cause runtime errors in the sync-enabled path unless the return type or those call sites are adjusted.",
+          "severity": "High",
+          "category": "api",
+          "matched_candidate": "HubspotCalendarService treats fetch Response as HubspotToken when credential sharing is enabled, causing expiresIn to be undefined and expiryDate to become NaN",
+          "confidence": 0.95,
+          "reasoning": "The candidate issue identifies the same underlying problem as the golden comment - that when credential sharing is enabled, the refreshFunction returns a fetch Response object, but HubspotCalendarService expects a HubspotToken object. The candidate specifically mentions that this causes expiresIn to be undefined and expiryDate to become NaN, which is a concrete manifestation of the type mismatch described in the golden comment. Both are pointing to the same bug: the return type mismatch between what refreshFunction returns (Response) and what callers expect (integration-specific token objects like HubspotToken)."
+        },
+        {
+          "golden_comment": "When the sync endpoint path is used, res is a fetch Response and has no .data; res?.data will be undefined and token.access_token will throw at runtime. This relies on a consistent return shape from refreshOAuthTokens, which isn\u2019t guaranteed currently.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "Google adapter reads res.data on a Response from refreshOAuthTokens, but Response has no data property, causing token.access_token to throw",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: when using the sync endpoint path, the response from refreshOAuthTokens is a fetch Response object which doesn't have a .data property, so res.data will be undefined and accessing token.access_token will throw at runtime. Both comments point to the same bug regarding the inconsistent return shape from refreshOAuthTokens."
+        },
+        {
+          "golden_comment": "The `refreshOAuthTokens` function is passed `credentialId` instead of `userId`, which breaks the credential sync functionality by causing incorrect user lookups. This issue can lead to failures in syncing user credentials, impacting user experience.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "refreshOAuthTokens is passed credentialId instead of userId in zoho-bigin CalendarService, sending wrong user ID to sync endpoint",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: refreshOAuthTokens is being passed credentialId instead of userId in the zoho-bigin CalendarService. Both comments point to the same bug where the wrong parameter is being passed to the function, which would cause incorrect user lookups and break credential sync functionality."
+        },
+        {
+          "golden_comment": "The Salesforce integration checks `response.statusText` instead of `response.ok` when handling OAuth token refresh responses. This can lead to unreliable behavior, as a successful response may not be correctly identified, resulting in the use of stale credentials and potential authentication failures.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "Sync response from refreshOAuthTokens is returned without checking HTTP status, causing failed responses to be passed to token parser",
+          "confidence": 0.85,
+          "reasoning": "The candidate issue identifies a problem with not checking HTTP status on the response from refreshOAuthTokens, which is the same underlying issue as the golden comment. The golden comment specifically mentions checking `response.statusText` instead of `response.ok`, which means the status check is unreliable. The candidate describes this as 'returned without checking HTTP status' - while the wording differs slightly (the golden says it checks the wrong thing, the candidate says it doesn't check properly), both are pointing to the same fundamental problem: the OAuth token refresh response is not being properly validated for success, leading to potential authentication failures with stale credentials."
+        },
+        {
+          "golden_comment": "The `jsforce.Connection` is created using stale `credentialKey.access_token` and `credentialKey.instance_url` after a token refresh, which can lead to authentication failures and incorrect data access. Ensure that the connection is established using the refreshed token values instead.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "Salesforce connection uses stale credentialKey.access_token after refresh instead of accessTokenParsed.data.access_token",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment - that the Salesforce connection is using stale credentialKey.access_token after a token refresh instead of using the refreshed token values. Both comments point to the same bug where the connection should use the newly refreshed access token (accessTokenParsed.data.access_token) rather than the original stale credentialKey.access_token."
+        },
+        {
+          "golden_comment": "The `appCredentialWebhookRequestBodySchema.parse` function can throw on invalid payloads, resulting in 500 Internal Server Errors instead of the expected 400 Bad Request responses. This can lead to confusion for clients and hinder proper error handling.",
+          "severity": "Medium",
+          "category": "api",
+          "matched_candidate": "Unhandled ZodError from appCredentialWebhookRequestBodySchema.parse causes 500 instead of 400 response on invalid payloads",
+          "confidence": 0.99,
+          "reasoning": "The candidate issue identifies exactly the same problem as the golden comment: the appCredentialWebhookRequestBodySchema.parse function can throw a ZodError on invalid payloads, which results in a 500 Internal Server Error instead of the expected 400 Bad Request response. Both comments point to the same underlying issue - unhandled validation errors causing incorrect HTTP status codes."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "prisma.credential.update called in salesforce getClient without importing prisma, throwing ReferenceError"
+        },
+        {
+          "candidate": "ZohoCrmCalendarService reads .data off the Response returned by refreshOAuthTokens, causing TypeError when accessing zohoCrmTokenInfo.data.error"
+        },
+        {
+          "candidate": "Unhandled throw in JSON.parse(symmetricDecrypt(...)) when reqBody.keys is malformed or encrypted with mismatched key"
+        },
+        {
+          "candidate": "Salesforce refresh calls login.salesforce.com directly bypassing refreshOAuthTokens, so credential syncing is never used for Salesforce"
+        }
+      ],
+      "false_negatives": [
+        {
+          "golden_comment": "The parseRefreshTokenResponse function incorrectly sets refresh_token to the hardcoded string 'refresh_token' when it's missing from the OAuth refresh token response. This invalidates the token, breaking subsequent token refreshes and causing authentication failures.",
+          "severity": "High",
+          "category": "bug"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 13,
+      "total_golden": 9,
+      "tp": 8,
+      "fp": 4,
+      "fn": 1,
+      "errors_count": 0,
+      "precision": 0.6153846153846154,
+      "recall": 0.8888888888888888,
+      "tool": "pr-lens",
+      "repo_name": "cal_dot_com__cal.com__pr-lens__PR11059__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/cal_dot_com__cal.com__pr-lens__PR11059__20261109/pull/6"
+    }
+  },
+  "https://github.com/calcom/cal.com/pull/7232": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "Asynchronous functions deleteScheduledEmailReminder and deleteScheduledSMSReminder are called without await inside forEach loops. This occurs during booking rescheduling/cancellation, and workflow/workflow step deletion/updates. Consequently, scheduled workflow reminders may not be reliably cancelled, potentially leaving them active.",
+          "severity": "Medium",
+          "category": "concurrency",
+          "matched_candidate": "handleCancelBooking calls deleteScheduledEmailReminder and deleteScheduledSMSReminder inside forEach without awaiting them, so the serverless runtime can finish before the DB cleanup commits and reminder messages can still be sent",
+          "confidence": 0.95,
+          "reasoning": "The candidate issue identifies the same core problem as the golden comment: deleteScheduledEmailReminder and deleteScheduledSMSReminder are called inside forEach loops without await, which can cause scheduled reminders to not be properly cancelled. The candidate specifically mentions handleCancelBooking as one location, while the golden comment mentions multiple locations (booking rescheduling/cancellation, workflow/workflow step deletion/updates). Both identify the same underlying bug - async functions not being awaited in forEach loops leading to unreliable cancellation of scheduled reminders."
+        },
+        {
+          "golden_comment": "When immediateDelete is true, the deleteScheduledEmailReminder function cancels the SendGrid email but fails to delete the corresponding WorkflowReminder record from the database. This creates orphaned database entries and is inconsistent with the immediateDelete: false path, which marks the record as cancelled. The SendGrid DELETE API call is also omitted in this path.",
+          "severity": "High",
+          "category": "data",
+          "matched_candidate": "immediateDelete branch in deleteScheduledEmailReminder returns without deleting the row or setting cancelled: true, leaving the previous booking's reminder rows as scheduled: true on reschedule",
+          "confidence": 0.95,
+          "reasoning": "The candidate issue identifies the same core problem: when immediateDelete is true, the function returns without deleting the database row or setting cancelled: true, leaving orphaned/inconsistent WorkflowReminder records. Both comments point to the same bug - the immediateDelete branch fails to properly handle the database record after canceling the SendGrid email, creating inconsistency with the other code path."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "for loop in scheduleEmailReminders.ts awaits client.request inside a single try, so if one reminder fails, remaining reminders are not cancelled, their emails still send, and Promise.all(workflowRemindersToDelete) never deletes the already-cancelled rows"
+        },
+        {
+          "candidate": "When isSenderIdNeeded is true and isPhoneNumberNeeded is false, the sender ID settings section no longer renders, so users cannot configure the sender ID"
+        }
+      ],
+      "false_negatives": [
+        {
+          "golden_comment": "The 'cancelled' field is nullable, which can lead to existing records having null values instead of a default of false. This can cause incorrect behavior in the application when checking the cancellation status of reminders.",
+          "severity": "Medium",
+          "category": "data"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 6,
+      "total_golden": 3,
+      "tp": 2,
+      "fp": 2,
+      "fn": 1,
+      "errors_count": 0,
+      "precision": 0.3333333333333333,
+      "recall": 0.6666666666666666,
+      "tool": "pr-lens",
+      "repo_name": "cal_dot_com__cal.com__pr-lens__PR7232__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/cal_dot_com__cal.com__pr-lens__PR7232__20261109/pull/6"
+    }
+  },
+  "https://github.com/calcom/cal.com/pull/14740": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "The addGuests.handler.ts blacklist check uses blacklistedGuestEmails.includes(guest) after lowercasing the blacklist but not the input guest emails, allowing attackers to bypass BLACKLISTED_GUEST_EMAILS restrictions by submitting emails with uppercase characters.",
+          "severity": "High",
+          "category": "security",
+          "matched_candidate": "blacklistedGuestEmails.includes(guest) compares lowercased list to raw email without lowercasing guest, allowing blacklisted emails with uppercase letters to bypass the filter",
+          "confidence": 0.99,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: the blacklist check compares lowercased blacklist entries against non-lowercased input guest emails, allowing bypass by using uppercase characters. Both comments point to the same bug in addGuests.handler.ts where the includes() check fails due to case sensitivity mismatch."
+        },
+        {
+          "golden_comment": "The logic for checking team admin/owner permissions is incorrect. This condition uses AND (&&) which requires both isTeamAdmin AND isTeamOwner to be true, but it should use OR (||) since a user needs to be either an admin OR an owner to have permission.",
+          "severity": "Critical",
+          "category": "bug",
+          "matched_candidate": "isTeamAdminOrOwner uses && instead of || - team admin who is not an owner fails the check and gets FORBIDDEN when adding guests",
+          "confidence": 1.0,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: the isTeamAdminOrOwner check incorrectly uses && (AND) instead of || (OR), which means a team admin who is not an owner would fail the permission check. Both comments point to the same logical operator bug in the team admin/owner permission checking."
+        },
+        {
+          "golden_comment": "The sendAddGuestsEmails function in email-manager.ts passes the full calendarEvent.attendees array when determining which attendees receive AttendeeScheduledEmail vs AttendeeAddGuestsEmail, but checks if newGuests.includes(attendee.email) where newGuests is the input guests array.",
+          "severity": "Medium",
+          "category": "bug",
+          "matched_candidate": "sendAddGuestsEmails(evt, guests) passes unfiltered guests instead of uniqueGuests, causing newGuests.includes(attendee.email) to match existing attendees and send them wrong email type",
+          "confidence": 0.85,
+          "reasoning": "The candidate issue identifies a problem with sendAddGuestsEmails related to the guests parameter and the newGuests.includes(attendee.email) check. The golden comment describes the same function and the same logic issue - that the check uses newGuests (the input guests array) to determine email types. The candidate specifically mentions 'passes unfiltered guests instead of uniqueGuests' which relates to the same underlying problem of incorrect email type determination based on the newGuests.includes check. Both are pointing to the same bug in how attendees are categorized for different email types."
+        }
+      ],
+      "false_positives": [],
+      "false_negatives": [
+        {
+          "golden_comment": "uniqueGuests filters out existing attendees and blacklisted emails but does not deduplicate duplicates within the input; createMany can insert duplicate attendee rows if the client submits repeated emails.",
+          "severity": "Medium",
+          "category": "bug"
+        },
+        {
+          "golden_comment": "Starting with an array containing an empty string may cause validation issues. Consider starting with an empty array [] and handling the empty state in the MultiEmail component instead.",
+          "severity": "Low",
+          "category": "bug"
+        },
+        {
+          "golden_comment": "The `sendAddGuestsEmails` function does not check the `disableStandardEmails` flags in the `EventType` metadata, which may result in sending emails to hosts/attendees even when standard emails are disabled for the event type.",
+          "severity": "Medium",
+          "category": "bug"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 3,
+      "total_golden": 6,
+      "tp": 3,
+      "fp": 0,
+      "fn": 3,
+      "errors_count": 0,
+      "precision": 1.0,
+      "recall": 0.5,
+      "tool": "pr-lens",
+      "repo_name": "cal_dot_com__cal.com__pr-lens__PR14740__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/cal_dot_com__cal.com__pr-lens__PR14740__20261109/pull/6"
+    }
+  },
+  "https://github.com/calcom/cal.com/pull/10600": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "Because backupCodes are decrypted and mutated in memory before being written back, two concurrent login requests using the same backupCode could both pass this check and update, so a single backup code may effectively be accepted more than once if used concurrently, weakening the intended one-time-use semantics.",
+          "severity": "High",
+          "category": "concurrency",
+          "matched_candidate": "Read-modify-write on backupCodes permits concurrent reuse - two concurrent logins can both find and use the same single-use backup code",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies exactly the same problem as the golden comment: a race condition where concurrent login requests can both use the same backup code due to the read-modify-write pattern, allowing a single-use backup code to be accepted multiple times. Both comments point to the same concurrency vulnerability with backup codes."
+        },
+        {
+          "golden_comment": "Object URL for backup codes is not revoked on component unmount, leading to a potential memory leak. This can cause increased memory usage over time, especially if the component is mounted and unmounted frequently.",
+          "severity": "Low",
+          "category": "perf",
+          "matched_candidate": "backupCodesUrl blob URL is never revoked on modal close or unmount, causing memory leak and keeping backup codes in memory for page lifetime",
+          "confidence": 0.98,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment: the backupCodesUrl blob/object URL is never revoked when the component unmounts or modal closes, which causes a memory leak. Both comments point to the same underlying issue - failure to clean up the object URL created for backup codes, leading to memory leaks."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "handleEnable sets DisplayBackupCodes without calling onEnable, so dismissing backup-codes dialog via Escape/overlay/close icon never invalidates viewer.me and settings switch shows 2FA as disabled"
+        },
+        {
+          "candidate": "credentials.backupCode branch runs without verifying password if totpCode is sent, allowing attacker with backup code to bypass password verification"
+        },
+        {
+          "candidate": "navigator.clipboard.writeText promise is not awaited or caught, showing success toast even if clipboard access fails"
+        }
+      ],
+      "false_negatives": [
+        {
+          "golden_comment": "The exported function TwoFactor handles backup codes and is in BackupCode.tsx. Inconsistent naming.",
+          "severity": "Low",
+          "category": "style"
+        },
+        {
+          "golden_comment": "Error message mentions 'backup code login' but this is a disable endpoint, not login",
+          "severity": "Low",
+          "category": "doc_defect"
+        },
+        {
+          "golden_comment": "Backup code validation is case-sensitive due to the use of indexOf(). This causes validation to fail if a user enters uppercase hex characters, as backup codes should be case-insensitive for a better user experience.",
+          "severity": "Medium",
+          "category": "bug"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 5,
+      "total_golden": 5,
+      "tp": 2,
+      "fp": 3,
+      "fn": 3,
+      "errors_count": 0,
+      "precision": 0.4,
+      "recall": 0.4,
+      "tool": "pr-lens",
+      "repo_name": "cal_dot_com__cal.com__pr-lens__PR10600__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/cal_dot_com__cal.com__pr-lens__PR10600__20261109/pull/6"
+    }
+  },
+  "https://github.com/calcom/cal.com/pull/10967": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "A null reference occurs in GoogleCalendarService.createEvent() and updateEvent() when mainHostDestinationCalendar is destructured from evt.destinationCalendar but evt.destinationCalendar is null or an empty array, causing mainHostDestinationCalendar to be undefined.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "mainHostDestinationCalendar.integration throws TypeError when evt.destinationCalendar is null or empty, causing Google Meet booking creation to fail instead of falling back to Cal Video",
+          "confidence": 0.95,
+          "reasoning": "Both comments identify the same issue: when evt.destinationCalendar is null or empty, the destructuring of mainHostDestinationCalendar results in undefined, and subsequent access to mainHostDestinationCalendar.integration causes a TypeError/null reference error. The candidate specifically mentions the .integration access causing the error, while the golden comment describes the root cause (mainHostDestinationCalendar being undefined). They're describing the same underlying bug."
+        },
+        {
+          "golden_comment": "Logic error: when externalCalendarId is provided, you're searching for a calendar where externalId === externalCalendarId, but this will always fail since you're looking for a calendar that matches itself. Should likely find by credentialId or use different logic.",
+          "severity": "High",
+          "category": "bug",
+          "matched_candidate": "updateEvent looks up destination calendar by falsy externalCalendarId, so selectedCalendar is always undefined and updates are sent without a destination calendar ID",
+          "confidence": 0.8,
+          "reasoning": "Both comments identify an issue with the calendar lookup logic in updateEvent. The golden comment points out that searching for a calendar where externalId === externalCalendarId will always fail due to flawed logic. The candidate comment says the lookup uses 'falsy externalCalendarId' causing selectedCalendar to always be undefined. Both are identifying the same fundamental problem - the calendar lookup logic is broken and selectedCalendar will not be found correctly. The candidate's explanation of 'falsy' isn't quite accurate to the actual bug (it's a logic error in the comparison, not a falsy check), but they're pointing to the same symptom: selectedCalendar is always undefined/not found properly."
+        },
+        {
+          "golden_comment": "Logic inversion in organization creation: The slug property is now conditionally set when IS_TEAM_BILLING_ENABLED is true, instead of when it's false as originally intended. This change, combined with requestedSlug still being set when IS_TEAM_BILLING_ENABLED is true, results in both properties being set when billing is enabled, and neither when disabled",
+          "severity": "Medium",
+          "category": "bug",
+          "matched_candidate": "IS_TEAM_BILLING_ENABLED ? { slug } : {} inverts the slug condition - sets slug only when billing is enabled instead of disabled",
+          "confidence": 0.95,
+          "reasoning": "The candidate issue identifies the same core problem as the golden comment - the logic inversion where slug is now set when IS_TEAM_BILLING_ENABLED is true instead of when it's false. The candidate correctly identifies this as an inversion of the original condition. While the golden comment provides more detail about the combined effect with requestedSlug, both are pointing to the same fundamental bug: the slug condition logic has been inverted."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "deleteEvent finds a calendar by a falsy externalCalendarId, causing it to return undefined and fall back to primary calendar instead of the destination calendar"
+        },
+        {
+          "candidate": "evt.destinationCalendar?.push drops team calendars when evt.destinationCalendar is null, failing to create events for other hosts in collective bookings"
+        },
+        {
+          "candidate": "credentialId: isCalendarType ? result.credentialId : undefined drops video credentials, causing handleCancelBooking to fail finding bookingVideoReference.credentialId and leaving video meetings behind on cancel"
+        },
+        {
+          "candidate": "evt.destinationCalendar?.push drops host calendars when destinationCalendar is null because it's initialized to null instead of empty array"
+        }
+      ],
+      "false_negatives": [
+        {
+          "golden_comment": "The optional chaining on mainHostDestinationCalendar?.integration is redundant since you already check mainHostDestinationCalendar in the ternary condition.",
+          "severity": "Low",
+          "category": "style"
+        },
+        {
+          "golden_comment": "The Calendar interface now requires createEvent(event, credentialId), but some implementations (e.g., Lark/Office365) still declare createEvent(event) only\u2014this breaks the interface contract (also applies to other locations in the PR).",
+          "severity": "Low",
+          "category": "api"
+        },
+        {
+          "golden_comment": "The `credential` may be undefined when passed to `updateEvent` if `reference.credentialId` is set but the credential is not found. This can lead to a runtime error when `updateEvent` is called with an undefined credential, which should be handled to prevent crashes.",
+          "severity": "High",
+          "category": "bug"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 7,
+      "total_golden": 6,
+      "tp": 3,
+      "fp": 4,
+      "fn": 3,
+      "errors_count": 0,
+      "precision": 0.42857142857142855,
+      "recall": 0.5,
+      "tool": "pr-lens",
+      "repo_name": "cal_dot_com__cal.com__pr-lens__PR10967__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/cal_dot_com__cal.com__pr-lens__PR10967__20261109/pull/6"
+    }
+  },
+  "https://github.com/calcom/cal.com/pull/8087": {
+    "pr-lens": {
+      "skipped": false,
+      "true_positives": [
+        {
+          "golden_comment": "The code uses forEach with async callbacks, which causes asynchronous operations (e.g., calendar/video event deletions, payment refunds) to run concurrently without being awaited. This 'fire-and-forget' behavior leads to unhandled promise rejections, race conditions, and incomplete cleanup, as surrounding try-catch blocks cannot properly handle errors from these unawaited promises. Replace forEach with for...of loops or Promise.all() with map() to ensure proper sequential execution and error handling.",
+          "severity": "Critical",
+          "category": "concurrency",
+          "matched_candidate": "bookingRefsFiltered.forEach(async ...) in packages/app-store/vital/lib/reschedule.ts does not await its async callback, so getCalendar and deleteEvent rejections escape the surrounding try/catch and Reschedule returns before calendar event deletion completes",
+          "confidence": 0.95,
+          "reasoning": "The candidate issue identifies the exact same problem as the golden comment - using forEach with async callbacks that don't properly await the asynchronous operations. The candidate specifically mentions that the async callback is not awaited, causing rejections to escape the try/catch and the function to return before completion. This matches the golden comment's description of 'fire-and-forget' behavior leading to unhandled promise rejections and incomplete cleanup. The candidate points to a specific file (reschedule.ts) which appears to be one instance of this pattern."
+        }
+      ],
+      "false_positives": [
+        {
+          "candidate": "bookingRefsFiltered.forEach(async ...) in packages/app-store/wipemycalother/lib/reschedule.ts is not awaited, so rejections from getCalendar or deleteEvent escape the surrounding try/catch as unhandled rejections while Reschedule returns success before deletions complete"
+        },
+        {
+          "candidate": "forEach callback in packages/features/bookings/lib/handleCancelBooking.ts is not awaited, so the handler can continue before recurring bookings are updated and callback errors are not handled by the surrounding flow"
+        }
+      ],
+      "false_negatives": [
+        {
+          "golden_comment": "Consider adding try-catch around the await to handle import failures gracefully",
+          "severity": "Low",
+          "category": "speculative"
+        }
+      ],
+      "errors": [],
+      "total_candidates": 4,
+      "total_golden": 2,
+      "tp": 1,
+      "fp": 2,
+      "fn": 1,
+      "errors_count": 0,
+      "precision": 0.25,
+      "recall": 0.5,
+      "tool": "pr-lens",
+      "repo_name": "cal_dot_com__cal.com__pr-lens__PR8087__20261109",
+      "pr_url": "https://github.com/pr-lens-bench/cal_dot_com__cal.com__pr-lens__PR8087__20261109/pull/6"
+    }
+  }
+}
